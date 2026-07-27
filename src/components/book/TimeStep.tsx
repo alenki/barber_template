@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import {
   clock,
   dayLabel,
   freeCount,
   monthShort,
+  nowSnapshot,
   openingFor,
+  serverSnapshot,
   slotsFor,
   spell,
+  subscribeNever,
   WEEKDAY,
   type Day,
   type Room,
@@ -44,21 +47,26 @@ export function TimeStep({
   const dayIndex = days.findIndex((d) => d.iso === date);
   const day = dayIndex >= 0 ? days[dayIndex] : null;
 
+  /* The wall clock, read on the client only. Today's hours that have already
+     gone are dropped rather than offered — booking this morning at 23:05 is
+     not a thing the diary should allow. */
+  const now = useSyncExternalStore(subscribeNever, nowSnapshot, serverSnapshot);
+
   const slots = useMemo(
-    () => (day ? slotsFor(room, day, dayIndex, service.minutes) : []),
-    [room, day, dayIndex, service.minutes]
+    () => (day ? slotsFor(room, day, dayIndex, service.minutes, now) : []),
+    [room, day, dayIndex, service.minutes, now]
   );
 
   /* Land on the first day that has an hour going spare, so the step opens
      with something to read rather than an instruction. */
   const firstOpen = useMemo(() => {
     for (let i = 0; i < days.length; i += 1) {
-      if (freeCount(slotsFor(room, days[i], i, service.minutes)) > 0) {
+      if (freeCount(slotsFor(room, days[i], i, service.minutes, now)) > 0) {
         return days[i].iso;
       }
     }
     return null;
-  }, [days, room, service.minutes]);
+  }, [days, room, service.minutes, now]);
 
   useEffect(() => {
     if (!date && firstOpen) onPickDay(firstOpen);
@@ -86,7 +94,7 @@ export function TimeStep({
           const closed = !openingFor(room, d.weekday).window;
           const spare = closed
             ? 0
-            : freeCount(slotsFor(room, d, i, service.minutes));
+            : freeCount(slotsFor(room, d, i, service.minutes, now));
           const chosen = d.iso === date;
           const unavailable = closed || spare === 0;
 

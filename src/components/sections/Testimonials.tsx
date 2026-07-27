@@ -113,8 +113,11 @@ export function Testimonials() {
             <span id="testimonials-eyebrow" className="label">
               What people say
             </span>
+            {/* Deliberately not "on Google": the shop is invented, and a
+                template should not ship a fabricated third-party rating that
+                a real barbershop might publish unchanged. */}
             <span className="label text-ash">
-              {RATING} on Google · {count} verified reviews
+              {RATING} average · {count} reviews
             </span>
           </span>
         </Rise>

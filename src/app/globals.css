@@ -24,6 +24,16 @@
   --text-lg: clamp(1.6rem, 3.2vw, 3rem);
   --text-md: clamp(1.15rem, 1.7vw, 1.6rem);
 
+  /* `lg` and `xl` collide with Tailwind's own size keys, so its default
+     `--text-lg--line-height` (1.556) and `--text-xl--line-height` (1.4)
+     survive and outrank `.display`'s 0.86 — every card title on the site was
+     silently setting at magazine leading. Pinning them here fixes all of it at
+     once. Smaller display sizes want fractionally more leading than the mega
+     ones, hence 0.95/0.9 rather than a flat 0.86. */
+  --text-xl--line-height: 0.9;
+  --text-lg--line-height: 0.95;
+  --text-md--line-height: 1.4;
+
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
 }
@@ -63,9 +73,20 @@
     color: var(--color-ink);
   }
 
+  /* currentColor alone goes invisible whenever a control's own type colour
+     matches the slab behind it (ember type on an ember slab, for instance).
+     The paper halo sitting outside the ink ring means one of the two is always
+     legible, on all three slab colours. */
   :focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
+    box-shadow: 0 0 0 5px var(--color-paper);
+  }
+
+  /* On ink slabs the ring inverts, so the ink outline reads against the halo. */
+  [data-tone="paper"] :focus-visible {
+    outline-color: var(--color-paper);
+    box-shadow: 0 0 0 5px var(--color-ink);
   }
 
   img {

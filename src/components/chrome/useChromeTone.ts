@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export type Tone = "ink" | "paper";
 
@@ -13,12 +14,18 @@ export type Tone = "ink" | "paper";
  */
 export function useChromeTone(offset = 72): Tone {
   const [tone, setTone] = useState<Tone>("ink");
+  /* The header lives in the layout and survives route changes. Without the
+     pathname in the deps the effect would keep measuring the *previous*
+     route's detached slabs, and the header would sit ink-on-ink on any page
+     reached by a client-side navigation. */
+  const pathname = usePathname();
 
   useEffect(() => {
-    const slabs = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-tone]")
-    );
-    if (!slabs.length) return;
+    let slabs: HTMLElement[] = [];
+
+    const collect = () => {
+      slabs = Array.from(document.querySelectorAll<HTMLElement>("[data-tone]"));
+    };
 
     const read = () => {
       let current: Tone | null = null;
@@ -31,14 +38,26 @@ export function useChromeTone(offset = 72): Tone {
       if (current) setTone(current);
     };
 
+    collect();
     read();
+
+    /* Slabs also appear late — a Suspense fallback swapping for the real
+       booking flow, for instance — so watch for them rather than assuming
+       the first query saw everything. */
+    const mo = new MutationObserver(() => {
+      collect();
+      read();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
     window.addEventListener("scroll", read, { passive: true });
     window.addEventListener("resize", read);
     return () => {
+      mo.disconnect();
       window.removeEventListener("scroll", read);
       window.removeEventListener("resize", read);
     };
-  }, [offset]);
+  }, [offset, pathname]);
 
   return tone;
 }

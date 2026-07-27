@@ -61,10 +61,12 @@ export function SummaryRail({
                       <RowText label={row.label} value={value} />
                     ) : (
                       <>
-                        <span className="label shrink-0 opacity-40">
+                        {/* 40% ink on ember measured 2.21:1 — a real label,
+                            not decoration, so it has to clear 4.5:1. */}
+                        <span className="label shrink-0 opacity-70">
                           {row.label}
                         </span>
-                        <span className="label opacity-30" aria-hidden="true">
+                        <span className="label opacity-40" aria-hidden="true">
                           —
                         </span>
                         <span className="sr-only">Not chosen yet</span>
@@ -112,8 +114,10 @@ export function SummaryBar({
 }) {
   const filled = rows.filter((r) => r.value);
 
+  /* A <section>, not a <div> — `aria-label` is prohibited on the implicit
+     generic role, so on a phone this running summary had no name at all. */
   return (
-    <div
+    <section
       aria-label="Your booking so far"
       className="mt-6 border-t border-current/20 pt-3 md:hidden"
     >
@@ -132,6 +136,6 @@ export function SummaryBar({
           <span className="label ml-auto">{money(total)}</span>
         )}
       </div>
-    </div>
+    </section>
   );
 }

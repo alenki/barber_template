@@ -84,7 +84,10 @@ export function Footer() {
           segments={[{ text: "Your chair is" }, { text: "waiting.", italic: true }]}
           stagger={0.07}
         />
-        <div className="edge mt-8 flex flex-wrap items-center justify-between gap-4 pb-8">
+        {/* The sticky Book pill is ~76px off the bottom edge; without the
+            extra padding it lands on top of this line, which is the one place
+            on the site where content is guaranteed to sit under it. */}
+        <div className="edge mt-8 flex flex-wrap items-center justify-between gap-4 pb-28 md:pb-10">
           <p className="label opacity-60">
             © {shop.founded}—2026 {shop.name}. All rights reserved.
           </p>

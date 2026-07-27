@@ -3,6 +3,7 @@ import Link from "next/link";
 import { services, combos, shop, type Service } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
+import { spell } from "@/lib/words";
 
 /* ------------------------------------------------------------------
    Derived locally — content.ts owns the words, this file owns the maths.
@@ -10,23 +11,6 @@ import { Frame } from "@/components/motion/Frame";
    and the client, no dates, no randomness.
    ------------------------------------------------------------------ */
 
-const COUNT_WORDS = [
-  "Zero",
-  "One",
-  "Two",
-  "Three",
-  "Four",
-  "Five",
-  "Six",
-  "Seven",
-  "Eight",
-  "Nine",
-  "Ten",
-] as const;
-
-function spell(n: number) {
-  return COUNT_WORDS[n] ?? String(n);
-}
 
 const prices = [...services.map((s) => s.price), ...combos.map((c) => c.price)];
 const minutes = [...services.map((s) => s.minutes), ...combos.map((c) => c.minutes)];

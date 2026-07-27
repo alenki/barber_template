@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { posts } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
@@ -10,18 +8,9 @@ import { Frame } from "@/components/motion/Frame";
  * One mega word, a typewriter note pinned to the far edge, and three posts
  * that step down the page instead of sitting in a tidy row.
  *
- * Photograph descriptions are derived here because content.ts carries the
- * image paths but not their alt text.
+ * A server component: SplitText, Rise and Frame each carry their own
+ * "use client", so nothing here needs to ship the posts to the browser.
  */
-const ALT: Record<string, string> = {
-  "how-often-should-you-cut-your-hair":
-    "A badger shaving brush resting in a silver lather bowl beside two open straight razors and a row of clipper guards on a dark towel",
-  "growing-it-out-one-more-month":
-    "An illuminated red, white and blue barber pole mounted on a stone shopfront wall",
-  "everything-about-the-hot-towel":
-    "Clippers, a gold trimmer, shears, a straight razor, a comb and a neck brush laid out in a row on a black towel",
-};
-
 export function JournalStrip() {
   return (
     <section data-tone="ink" className="slab bg-paper text-ink">
@@ -52,7 +41,7 @@ export function JournalStrip() {
                 <div className="transition-transform duration-500 ease-out-expo group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5">
                   <Frame
                     src={post.image}
-                    alt={ALT[post.slug] ?? `Photograph from the ${post.category} journal`}
+                    alt={post.imageAlt}
                     className="aspect-[3/2] w-full"
                     sizes="(min-width: 768px) 30vw, 100vw"
                     parallax={6}

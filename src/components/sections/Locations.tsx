@@ -1,5 +1,3 @@
-"use client";
-
 import { locations, shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
@@ -120,11 +118,13 @@ export function Locations() {
       </ul>
 
       <Rise className="mt-16 flex justify-end md:mt-24">
-        <p className="note m-0 max-w-[46ch] text-right">
+        <p className="note m-0 max-w-[34ch] text-right">
           {WALK_IN}{" "}
+          {/* whitespace-nowrap so the number cannot wrap into a two-line,
+              33px-tall tap target the way it did at 375px. */}
           <a
             href={shop.phoneHref}
-            className="underline underline-offset-[5px] transition-opacity duration-500 ease-out-expo hover:opacity-60"
+            className="inline-block py-2 whitespace-nowrap underline underline-offset-[5px] transition-opacity duration-500 ease-out-expo hover:opacity-60"
           >
             {shop.phone}
           </a>

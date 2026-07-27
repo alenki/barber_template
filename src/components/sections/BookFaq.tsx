@@ -33,9 +33,11 @@ export function BookFaq() {
 
       <Rise className="edge flex items-baseline justify-between gap-6">
         <span className="label text-paper/55">Booking</span>
+        {/* -my-3 py-3 keeps the optical position while giving the tap target
+            the height it needs on a phone. */}
         <a
           href={shop.phoneHref}
-          className="label text-paper/55 transition-colors duration-500 hover:text-paper"
+          className="label -my-3 inline-block py-3 text-paper/55 transition-colors duration-500 hover:text-paper"
         >
           {shop.phone}
         </a>
@@ -56,7 +58,7 @@ export function BookFaq() {
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
           transition={{ duration: 1.4, delay: 0.25, ease: EASE }}
-          className="mt-[clamp(1rem,1.6vw,2.5rem)] h-px w-full origin-left bg-white/20"
+          className="mt-[clamp(1rem,1.6vw,2.5rem)] h-px w-full origin-left bg-paper/20"
         />
       </div>
 
@@ -88,7 +90,7 @@ export function BookFaq() {
       </div>
 
       <div className="edge mt-[clamp(4rem,9vw,9rem)]">
-        <div className="h-px w-full bg-white/20" />
+        <div className="h-px w-full bg-paper/20" />
         <div className="grid gap-y-10 pt-8 md:grid-cols-3 md:gap-x-8 md:pt-10">
           {locations.map((location, i) => (
             <Rise key={location.id} delay={i * 0.08}>
@@ -118,13 +120,13 @@ export function BookFaq() {
           </p>
           <a
             href={`mailto:${shop.email}`}
-            className="note mt-2 inline-block text-paper/70 underline-offset-4 transition-colors duration-500 hover:text-paper hover:underline"
+            className="note mt-1 inline-block py-2 text-paper/70 underline-offset-4 transition-colors duration-500 hover:text-paper hover:underline"
           >
             {shop.email}
           </a>
         </Rise>
 
-        <ul className="mt-10 border-t border-white/20 md:col-span-9 md:mt-0">
+        <ul className="mt-10 border-t border-paper/20 md:col-span-9 md:mt-0">
           {faqs.map((faq, i) => (
             <FaqRow
               key={faq.q}
@@ -161,7 +163,7 @@ function FaqRow({
   const panelId = `${baseId}-a${index}`;
 
   return (
-    <li className="border-b border-white/20">
+    <li className="border-b border-paper/20">
       <h3 className="m-0">
         <button
           type="button"
@@ -180,7 +182,7 @@ function FaqRow({
           </span>
           <span
             aria-hidden="true"
-            className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/40 transition-colors duration-500 group-hover:border-white/80 md:mt-2"
+            className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-paper/40 transition-colors duration-500 group-hover:border-paper/80 md:mt-2"
           >
             <motion.span
               animate={{ rotate: open ? 45 : 0 }}
@@ -193,28 +195,31 @@ function FaqRow({
         </button>
       </h3>
 
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="panel"
-            id={panelId}
-            role="region"
-            aria-labelledby={buttonId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              height: { duration: 0.55, ease: EASE },
-              opacity: { duration: 0.45, ease: EASE },
-            }}
-            className="overflow-hidden"
-          >
-            <p className="note max-w-[60ch] pb-9 text-paper/65 md:pr-16">
-              {answer}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* The region carrying `id` stays mounted whether or not it is open —
+          `aria-controls` on the button has to resolve to something, and it
+          pointed at nothing while collapsed. Only the animated inner panel
+          comes and goes. */}
+      <div id={panelId} role="region" aria-labelledby={buttonId}>
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="panel"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{
+                height: { duration: 0.55, ease: EASE },
+                opacity: { duration: 0.45, ease: EASE },
+              }}
+              className="overflow-hidden"
+            >
+              <p className="note max-w-[52ch] pb-9 text-paper/65 md:pr-16">
+                {answer}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </li>
   );
 }

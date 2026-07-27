@@ -5,6 +5,7 @@ import { shop } from "@/lib/content";
 import { Header } from "@/components/chrome/Header";
 import { Footer } from "@/components/chrome/Footer";
 import { StickyBook } from "@/components/chrome/StickyBook";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://maisonfade.ca"),
@@ -43,10 +44,12 @@ export default function RootLayout({
       className={`${display.variable} ${sans.variable} ${typewriter.variable}`}
     >
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <StickyBook />
+        <MotionProvider>
+          <Header />
+          <main id="main">{children}</main>
+          <Footer />
+          <StickyBook />
+        </MotionProvider>
       </body>
     </html>
   );

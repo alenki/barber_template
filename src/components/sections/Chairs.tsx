@@ -109,12 +109,19 @@ function Chair({ barber, place }: { barber: Barber; place: string }) {
             objectPosition="center 30%"
           />
 
+          {/* aria-hidden: this panel is a hover-only teaser that a touch user
+              never sees, and leaving it in the tree gave the card link a
+              250-character accessible name. The full bio lives on /barbers,
+              which is exactly where the link goes. */}
           <motion.div
+            aria-hidden="true"
             variants={{ rest: { y: "101%" }, open: { y: "0%" } }}
             transition={{ duration: 0.8, ease: EASE }}
             className="absolute inset-x-0 bottom-0 z-10 min-h-[34%] bg-ink px-5 pt-5 pb-6 text-paper"
           >
-            <p className="note normal-case">{barber.bio}</p>
+            <p className="font-typewriter text-[0.78rem] leading-[1.6] tracking-[0.02em]">
+              {barber.bio}
+            </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {barber.specialties.map((s) => (
                 <li

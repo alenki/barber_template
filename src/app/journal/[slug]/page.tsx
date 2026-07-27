@@ -12,17 +12,6 @@ import { Frame } from "@/components/motion/Frame";
    generated at render time, so the server and the client agree exactly.
    ------------------------------------------------------------------ */
 
-const ALT: Record<string, string> = {
-  "how-often-should-you-cut-your-hair":
-    "A badger shaving brush resting in a silver lather bowl beside two open straight razors and a row of clipper guards on a dark towel",
-  "growing-it-out-one-more-month":
-    "An illuminated red, white and blue barber pole mounted on a stone shopfront wall",
-  "everything-about-the-hot-towel":
-    "Clippers, a gold trimmer, shears, a straight razor, a comb and a neck brush laid out in a row on a black towel",
-};
-
-const altFor = (post: Post) =>
-  ALT[post.slug] ?? `Photograph from the ${post.category} journal at ${shop.name}`;
 
 /** Who was holding the clippers. Keyed to the barber ids in content.ts. */
 const WRITTEN_BY: Record<string, string> = {
@@ -110,7 +99,7 @@ export default async function JournalPostPage({
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-paper" />
         <Frame
           src={post.image}
-          alt={altFor(post)}
+          alt={post.imageAlt}
           priority
           sizes="100vw"
           parallax={6}
@@ -182,7 +171,7 @@ export default async function JournalPostPage({
                 >
                   <Frame
                     src={other.image}
-                    alt={altFor(other)}
+                    alt={other.imageAlt}
                     sizes="(min-width: 768px) 42vw, 100vw"
                     parallax={6}
                     className="aspect-[3/2] w-full"

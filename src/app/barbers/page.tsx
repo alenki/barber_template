@@ -4,6 +4,7 @@ import Link from "next/link";
 import { barbers, shop, type Barber } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
+import { spellNone } from "@/lib/words";
 
 export const metadata: Metadata = {
   title: "The Chairs",
@@ -14,21 +15,6 @@ export const metadata: Metadata = {
    nothing is generated at render time, so the server and the client always
    agree on the same markup. */
 
-const COUNT_WORDS = [
-  "No",
-  "One",
-  "Two",
-  "Three",
-  "Four",
-  "Five",
-  "Six",
-  "Seven",
-  "Eight",
-  "Nine",
-  "Ten",
-];
-
-const countWord = (n: number) => COUNT_WORDS[n] ?? String(n);
 
 const TOTAL_YEARS = barbers.reduce((sum, b) => sum + b.years, 0);
 const FIRST_CHAIR = barbers[0].chair;
@@ -51,7 +37,7 @@ export default function BarbersPage() {
       <section data-tone="ink" className="relative bg-ember text-ink">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
           <Rise>
-            <p className="label">{countWord(barbers.length)} chairs</p>
+            <p className="label">{spellNone(barbers.length)} chairs</p>
           </Rise>
 
           {/* `text-hero` is a registered utility — never text-[var(--…)]. */}

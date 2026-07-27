@@ -3,6 +3,7 @@ import Link from "next/link";
 import { posts, shop, type Post } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
+import { spellNone } from "@/lib/words";
 
 /* ------------------------------------------------------------------
    content.ts owns the words and the image paths. What it does not carry
@@ -12,33 +13,6 @@ import { Frame } from "@/components/motion/Frame";
    the server and the client always agree on the same markup.
    ------------------------------------------------------------------ */
 
-/** One real sentence per photograph. Never "image of". */
-const ALT: Record<string, string> = {
-  "how-often-should-you-cut-your-hair":
-    "A badger shaving brush resting in a silver lather bowl beside two open straight razors and a row of clipper guards on a dark towel",
-  "growing-it-out-one-more-month":
-    "An illuminated red, white and blue barber pole mounted on a stone shopfront wall",
-  "everything-about-the-hot-towel":
-    "Clippers, a gold trimmer, shears, a straight razor, a comb and a neck brush laid out in a row on a black towel",
-};
-
-const altFor = (post: Post) =>
-  ALT[post.slug] ?? `Photograph from the ${post.category} journal at ${shop.name}`;
-
-const COUNT_WORDS = [
-  "No",
-  "One",
-  "Two",
-  "Three",
-  "Four",
-  "Five",
-  "Six",
-  "Seven",
-  "Eight",
-  "Nine",
-  "Ten",
-];
-const countWord = (n: number) => COUNT_WORDS[n] ?? String(n);
 
 const TOTAL_MINUTES = posts.reduce((sum, p) => sum + p.readMinutes, 0);
 const CATEGORIES = Array.from(new Set(posts.map((p) => p.category)));
@@ -51,7 +25,7 @@ const index = (i: number) => String(i + 1).padStart(2, "0");
 
 export const metadata: Metadata = {
   title: "Journal",
-  description: `Notes from the chair at ${shop.name} in ${shop.city} — ${countWord(
+  description: `Notes from the chair at ${shop.name} in ${shop.city} — ${spellNone(
     posts.length
   ).toLowerCase()} entries on ${CATEGORY_LINE}, ${TOTAL_MINUTES} minutes of reading in total.`,
 };
@@ -89,7 +63,7 @@ export default function JournalPage() {
             delay={0.36}
             className="mt-[clamp(3rem,8vw,6rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
           >
-            <span className="label">{countWord(posts.length)} entries</span>
+            <span className="label">{spellNone(posts.length)} entries</span>
             <span className="label">{CATEGORIES.join(" · ")}</span>
             <span className="label">{TOTAL_MINUTES} minutes in total</span>
           </Rise>
@@ -121,7 +95,7 @@ export default function JournalPage() {
 
             <Frame
               src={lead.image}
-              alt={altFor(lead)}
+              alt={lead.imageAlt}
               priority
               sizes="100vw"
               parallax={7}
@@ -170,7 +144,7 @@ export default function JournalPage() {
 
                   <Frame
                     src={post.image}
-                    alt={altFor(post)}
+                    alt={post.imageAlt}
                     sizes="(min-width: 768px) 44vw, 100vw"
                     parallax={6}
                     className="mt-6 aspect-[3/2] w-full md:mt-8 md:aspect-[4/5]"

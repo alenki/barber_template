@@ -18,11 +18,14 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * "Services" set in Bodoni Moda italic at the .mega tracking (-0.045em) measures
- * 3.1825x its own font-size, of which the last 0.045em is the trailing letter
- * space — invisible. 32cqw therefore lands the *ink* flush against both gutters
- * at every width. cqw, not vw, so the desktop scrollbar is out of the sum.
+ * 3.183x its own font-size. Dividing the container's own inline size by that
+ * lands the word flush against both gutters at every width — but only if the
+ * container IS the gutter-to-gutter column, hence `containerType` on the .edge
+ * div rather than on a full-bleed parent. cqw, not vw, keeps a desktop
+ * scrollbar out of the sum. 3.2 rather than 3.183 leaves a hair of slack so
+ * the italic overhang on the final "s" is never clipped.
  */
-const TITLE_FILL = "32cqw";
+const TITLE_FILL = "calc(100cqw / 3.2)";
 
 const PREVIEW_W = 320;
 const PREVIEW_H = 420;
@@ -93,18 +96,17 @@ export function Services() {
       {/* ── the word ────────────────────────────────────────────── */}
       <div className="relative mt-[clamp(3.5rem,8vw,7rem)]">
         <div
-          className="overflow-x-clip px-[clamp(0.5rem,1.25vw,1.5rem)]"
-          style={{
-            containerType: "inline-size",
-            ["--text-mega" as string]: TITLE_FILL,
-          }}
+          className="edge overflow-x-clip"
+          style={{ containerType: "inline-size" }}
         >
-          <SplitText
-            as="h2"
-            duration={1.15}
-            className="mega block"
-            segments={[{ text: "Services" }]}
-          />
+          <div style={{ ["--text-mega" as string]: TITLE_FILL }}>
+            <SplitText
+              as="h2"
+              duration={1.15}
+              className="mega -ml-[0.015em] block"
+              segments={[{ text: "Services" }]}
+            />
+          </div>
         </div>
 
         <span
@@ -161,11 +163,14 @@ export function Services() {
                     on ? "text-ember" : ""
                   } ${dim ? "opacity-[0.35]" : "opacity-100"}`}
                 >
-                  {/* mobile thumbnail — the cursor preview's stand-in */}
+                  {/* mobile thumbnail — the cursor preview's stand-in.
+                      alt="" on purpose: it is decorative here, and a real alt
+                      made screen readers announce the service name twice
+                      inside the same link. */}
                   <span className="col-start-1 row-span-2 row-start-1 block h-14 w-14 self-center overflow-hidden rounded-[10px] bg-ink/10 lg:hidden">
                     <Image
                       src={service.image}
-                      alt={altFor(service.name)}
+                      alt=""
                       width={112}
                       height={112}
                       sizes="56px"

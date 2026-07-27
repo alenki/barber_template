@@ -15,8 +15,23 @@ export function Header() {
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+
+    /* Locking the scroll is not enough — without `inert` the tab order walks
+       straight off the overlay and into the page underneath it, which is
+       covered and unreadable. */
+    const behind = [
+      document.getElementById("main"),
+      document.querySelector("footer"),
+    ].filter(Boolean) as HTMLElement[];
+
+    for (const el of behind) {
+      if (open) el.setAttribute("inert", "");
+      else el.removeAttribute("inert");
+    }
+
     return () => {
       document.body.style.overflow = "";
+      for (const el of behind) el.removeAttribute("inert");
     };
   }, [open]);
 

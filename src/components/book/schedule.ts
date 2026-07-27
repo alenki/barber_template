@@ -15,25 +15,8 @@ export type Treatment = (typeof services)[number];
 
 /* ------------------------------------------------------------------ words */
 
-const COUNT_WORDS = [
-  "Zero",
-  "One",
-  "Two",
-  "Three",
-  "Four",
-  "Five",
-  "Six",
-  "Seven",
-  "Eight",
-  "Nine",
-  "Ten",
-  "Eleven",
-  "Twelve",
-  "Thirteen",
-  "Fourteen",
-] as const;
 
-export const spell = (n: number): string => COUNT_WORDS[n] ?? String(n);
+export { spell } from "@/lib/words";
 
 export const money = (n: number) => `$${n}`;
 
@@ -185,19 +168,53 @@ function pressure(dayIndex: number) {
   return 21;
 }
 
+/**
+ * Minutes past midnight, local. Used only to hide hours that have already
+ * gone — never called during render.
+ */
+export function minutesNow(): number {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+/* --------------------------------------------------------- client clock --
+   Both readings come through `useSyncExternalStore`: the server snapshot is
+   null and the client snapshot is the real value, so there is no hydration
+   mismatch and no setState firing out of an effect. `getSnapshot` has to
+   return the same reference every call, hence the module-level caches. */
+
+let cachedToday: string | null = null;
+let cachedNow: number | null = null;
+
+export const todaySnapshot = () => (cachedToday ??= isoOf(new Date()));
+export const nowSnapshot = () => (cachedNow ??= minutesNow());
+export const serverSnapshot = () => null;
+export const subscribeNever = () => () => {};
+
+/** No same-day booking inside this window; there is a chair to prepare. */
+export const LEAD_MINUTES = 60;
+
 export function slotsFor(
   room: Room,
   day: Day,
   dayIndex: number,
-  serviceMinutes: number
+  serviceMinutes: number,
+  /** Minutes past midnight, passed only for today. Omit for any later day. */
+  earliest?: number | null
 ): Slot[] {
   const open = openingFor(room, day.weekday).window;
   if (!open) return [];
+
+  /* Today's diary must not offer this morning. Without this the flow happily
+     confirmed appointments twelve hours in the past. */
+  const floor =
+    dayIndex === 0 && earliest != null ? earliest + LEAD_MINUTES : -Infinity;
 
   const step = gridFor(serviceMinutes);
   const out: Slot[] = [];
   let i = 0;
   for (let t = open[0]; t + serviceMinutes <= open[1]; t += step, i += 1) {
+    if (t < floor) continue;
     out.push({
       start: t,
       end: t + serviceMinutes,

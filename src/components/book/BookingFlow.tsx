@@ -24,9 +24,11 @@ import {
   clock,
   dayLabel,
   DAY_COUNT,
-  isoOf,
   referenceCode,
+  serverSnapshot,
   spell,
+  subscribeNever,
+  todaySnapshot,
   type Day,
 } from "./schedule";
 
@@ -35,12 +37,6 @@ const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
 const STEP_COUNT = 5;
 const DONE = STEP_COUNT + 1;
-
-/* Today's date, read once on the client. `getSnapshot` has to return the same
-   reference every call or React re-renders forever, hence the module-level cache. */
-let cachedToday: string | null = null;
-const todaySnapshot = () => (cachedToday ??= isoOf(new Date()));
-const subscribeNever = () => () => {};
 
 /* ------------------------------------------------------------------
    The words on this screen that are not a name, a price or an hour.
@@ -126,7 +122,11 @@ export function BookingFlow() {
      server renders `null` and the client renders today's date — no hydration
      mismatch, and no setState cascading out of an effect. `todaySnapshot` is
      memoised at module scope because getSnapshot must be referentially stable. */
-  const startISO = useSyncExternalStore(subscribeNever, todaySnapshot, () => null);
+  const startISO = useSyncExternalStore(
+    subscribeNever,
+    todaySnapshot,
+    serverSnapshot
+  );
   const days: Day[] = useMemo(
     () => (startISO ? buildDays(startISO) : []),
     [startISO]
@@ -317,8 +317,10 @@ export function BookingFlow() {
                   <Confirmation booking={booking} onRestart={restart} />
                 ) : (
                   <>
+                    {/* h1, not h2 — the step question is the only heading on
+                        the page, and /book was the one route without one. */}
                     <SplitText
-                      as="h2"
+                      as="h1"
                       animateOnMount
                       stagger={0.04}
                       duration={0.85}

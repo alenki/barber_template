@@ -236,6 +236,8 @@ export type Post = {
   date: string;
   excerpt: string;
   image: string;
+  /** One real sentence describing the photograph. Never "image of". */
+  imageAlt: string;
   body: string[];
 };
 
@@ -249,6 +251,8 @@ export const posts: Post[] = [
     excerpt:
       "The honest answer is that it depends on the shape, not the calendar — and most men wait about nine days too long.",
     image: "/img/journal-1.jpg",
+    imageAlt:
+      "A badger shaving brush resting in a silver lather bowl beside two open straight razors and a row of clipper guards on a dark towel",
     body: [
       "The standard advice is four weeks, and the standard advice is wrong roughly half the time. What actually decides your interval is not how fast your hair grows but how much of the shape is doing the work.",
       "A skin fade is almost entirely shape. The moment the shortest section grows past a millimetre or two, the blend that took your barber twenty minutes stops reading as a blend and starts reading as a haircut that is growing out. Two to three weeks, no argument.",
@@ -266,6 +270,8 @@ export const posts: Post[] = [
     excerpt:
       "The awkward stage is not a stage. It is a shape problem, and it is fixable without losing the length.",
     image: "/img/journal-2.jpg",
+    imageAlt:
+      "An illuminated red, white and blue barber pole mounted on a stone shopfront wall",
     body: [
       "Every man who has tried to grow his hair out has quit in the same place: week seven, when the sides start to flare and the back sits on the collar like it is embarrassed to be there.",
       "That is not your hair failing. That is the perimeter and the weight going out of sync, and it takes about fifteen minutes to fix without touching the length on top.",
@@ -282,6 +288,8 @@ export const posts: Post[] = [
     excerpt:
       "Three towels, one badger brush, and the reason a shave takes forty minutes instead of nine.",
     image: "/img/journal-3.jpg",
+    imageAlt:
+      "Clippers, a gold trimmer, shears, a straight razor, a comb and a neck brush laid out in a row on a black towel",
     body: [
       "The towel is not theatre. It is the whole shave. Everything else — the brush, the lather, the razor — is downstream of what the towel does to the hair on your face.",
       "First towel, as hot as you can stand: it opens the follicle and softens the beard. Two minutes, no less. This is the one people cut short and it is the one that matters most.",

@@ -37,8 +37,12 @@ should draw itself in while that slab is under it. Ember and paper slabs are
 Fluid sizes available as Tailwind font-size utilities: `text-mega`, `text-hero`,
 `text-xl`, `text-lg`, `text-md`.
 
-> **Trap:** never write `text-[var(--text-hero)]` — Tailwind reads a bare `var()` as a
+> **Trap 1:** never write `text-[var(--text-hero)]` — Tailwind reads a bare `var()` as a
 > *colour*. Use the registered utility (`text-hero`) or a literal `clamp()`.
+>
+> **Trap 2:** `text-xl`, `text-lg` and `text-md` collide with Tailwind's own size keys, so
+> they drag Tailwind's stock line-height in over `.display`'s `0.86`. Whenever you put one
+> of those on display type, restate the leading: `className="display text-xl leading-[0.86]"`.
 
 Body copy in General Sans is rare and always short. Long-form prose only appears in
 the Journal. Everything else is either enormous display type or small typewriter copy.

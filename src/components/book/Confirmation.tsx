@@ -94,8 +94,12 @@ export function Confirmation({
                 <dt className="label border-t border-current/15 py-4 opacity-55">
                   {line.label}
                 </dt>
-                <dd className="m-0 border-t border-current/15 py-4">
-                  <span className="display block text-[clamp(1.05rem,1.7vw,1.5rem)] leading-tight italic">
+                {/* min-w-0 + break-words: a long unbroken email sets the
+                    1fr track's min-content width and pushed the whole grid
+                    16px past a 375px viewport, where body{overflow-x:hidden}
+                    then made the text unrecoverable. */}
+                <dd className="m-0 min-w-0 border-t border-current/15 py-4">
+                  <span className="display block [overflow-wrap:anywhere] text-[clamp(1.05rem,1.7vw,1.5rem)] leading-tight italic">
                     {line.value}
                   </span>
                 </dd>
