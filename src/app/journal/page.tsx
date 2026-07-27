@@ -3,7 +3,7 @@ import Link from "next/link";
 import { posts, shop, type Post } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-import { spellNone } from "@/lib/words";
+import { count, plural, spellNone } from "@/lib/words";
 
 /* ------------------------------------------------------------------
    content.ts owns the words and the image paths. What it does not carry
@@ -24,10 +24,18 @@ const [lead, ...rest] = posts;
 const index = (i: number) => String(i + 1).padStart(2, "0");
 
 export const metadata: Metadata = {
-  title: "Journal",
-  description: `Notes from the chair at ${shop.name} in ${shop.city} — ${spellNone(
-    posts.length
-  ).toLowerCase()} entries on ${CATEGORY_LINE}, ${TOTAL_MINUTES} minutes of reading in total.`,
+  title: "Журнал",
+  description: `Заметки из кресла «${shop.name}» ${shop.cityIn} — ${count(
+    posts.length,
+    "запись",
+    "записи",
+    "записей"
+  )} — ${CATEGORY_LINE} — и ${count(
+    TOTAL_MINUTES,
+    "минута",
+    "минуты",
+    "минут"
+  )} чтения в сумме.`,
 };
 
 export default function JournalPage() {
@@ -37,25 +45,25 @@ export default function JournalPage() {
       <section data-tone="ink" className="relative bg-ember text-ink">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
           <Rise className="border-t border-current/20 pt-4">
-            <p className="label">Notes from the chair</p>
+            <p className="label">Заметки из кресла</p>
           </Rise>
 
-          {/* "Journal" measures 3.01em wide in Bodoni italic at the mega
-              tracking. 28.5vw is the size that runs it gutter to gutter
+          {/* "Журнал" measures 2.87em wide in Playfair italic at the mega
+              tracking. 30vw is the size that runs it gutter to gutter
               without ever clipping — the binding case is 375px, where the
-              20px gutters leave 335px and the word draws 322. */}
+              20px gutters leave 335px and the word draws 323. */}
           <SplitText
             as="h1"
             delay={0.1}
             stagger={0.06}
-            className="mega -ml-[0.015em] mt-[clamp(1.5rem,3vw,2.5rem)] text-[clamp(3.5rem,28.5vw,34rem)]"
-            segments={[{ text: "Journal" }]}
+            className="mega -ml-[0.015em] mt-[clamp(1.5rem,3vw,2.5rem)] text-[clamp(3.5rem,30vw,36rem)]"
+            segments={[{ text: "Журнал" }]}
           />
 
           <Rise delay={0.28} className="mt-[clamp(3rem,9vw,7rem)] flex md:justify-end">
-            <p className="label max-w-[30ch] md:text-right">
-              Everything we would tell you in the chair, if there were ever
-              enough time to say it properly.
+            <p className="label max-w-[32ch] md:text-right">
+              Всё, что мы рассказали бы вам в кресле, если бы хватало времени
+              рассказать это как следует.
             </p>
           </Rise>
 
@@ -63,9 +71,12 @@ export default function JournalPage() {
             delay={0.36}
             className="mt-[clamp(3rem,8vw,6rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
           >
-            <span className="label">{spellNone(posts.length)} entries</span>
+            <span className="label">
+              {spellNone(posts.length, "f")}{" "}
+              {plural(posts.length, "запись", "записи", "записей")}
+            </span>
             <span className="label">{CATEGORIES.join(" · ")}</span>
-            <span className="label">{TOTAL_MINUTES} minutes in total</span>
+            <span className="label">{TOTAL_MINUTES} минут в сумме</span>
           </Rise>
         </div>
       </section>
@@ -73,7 +84,7 @@ export default function JournalPage() {
       {/* ---------------- Paper: the lead, then the rest two-up ---------------- */}
       <section data-tone="ink" className="slab bg-paper text-ink">
         <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
-          <span className="label">Newest first</span>
+          <span className="label">Сначала новое</span>
           <span
             className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
             aria-hidden="true"
@@ -121,7 +132,7 @@ export default function JournalPage() {
                   {lead.excerpt}
                 </p>
                 <span className="ui mt-7 inline-block underline underline-offset-[6px]">
-                  Read the whole thing
+                  Читать целиком
                 </span>
               </div>
             </div>
@@ -167,7 +178,7 @@ export default function JournalPage() {
                     </p>
 
                     <span className="ui mt-6 inline-block underline underline-offset-[6px]">
-                      Read
+                      Читать
                     </span>
                   </div>
                 </Link>
@@ -177,9 +188,9 @@ export default function JournalPage() {
         </ul>
 
         <Rise className="mt-20 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-t border-current/20 pt-4 md:mt-32">
-          <span className="label">Written in the shop</span>
+          <span className="label">Написано в зале</span>
           <span className="label text-ash">
-            Every entry by whoever was holding the clippers
+            Каждую запись писал тот, кто держал машинку
           </span>
         </Rise>
       </section>
@@ -198,7 +209,7 @@ function Meta({ post }: { post: Post }) {
         aria-hidden="true"
         className="inline-block size-[5px] shrink-0 rounded-full bg-ember"
       />
-      <span className="label">{post.readMinutes} min read</span>
+      <span className="label">{post.readMinutes} мин чтения</span>
     </div>
   );
 }

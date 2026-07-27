@@ -1,7 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { shop, nav, locations } from "@/lib/content";
+import { shop, nav, locations, BOOK_LABEL } from "@/lib/content";
 import { SplitText } from "@/components/motion/SplitText";
+
+/** Where a Moscow shop actually lives. Instagram is not one of them. */
+const SOCIAL = [
+  { label: "Telegram", href: shop.telegram },
+  { label: "VK", href: shop.vk },
+  { label: "Яндекс Карты", href: shop.maps },
+] as const;
 
 /**
  * Full-bleed photograph, links laid over it, and the closing line
@@ -15,7 +22,7 @@ export function Footer() {
     >
       <Image
         src="/img/interior-wide.jpg"
-        alt="The Saint-Denis room after close"
+        alt={`Зал «${locations[0].name}» после закрытия`}
         fill
         sizes="100vw"
         className="-z-10 object-cover opacity-70"
@@ -25,7 +32,7 @@ export function Footer() {
       <div className="edge grid gap-12 pt-32 md:grid-cols-[1fr_auto_auto] md:gap-16 md:pt-40">
         <div className="max-w-xs">
           <p className="label opacity-70">
-            {shop.name} — {shop.city}, {shop.province}
+            {shop.name} — {shop.city}, {shop.country}
           </p>
           <a
             href={`mailto:${shop.email}`}
@@ -42,7 +49,7 @@ export function Footer() {
         </div>
 
         <nav className="flex flex-col gap-3">
-          {[...nav, { label: "Book", href: "/book" }].map((item) => (
+          {[...nav, { label: BOOK_LABEL, href: "/book" }].map((item) => (
             <Link key={item.href} href={item.href} className="ui opacity-80 hover:opacity-100">
               {item.label}
             </Link>
@@ -50,15 +57,15 @@ export function Footer() {
         </nav>
 
         <div className="flex flex-col gap-3">
-          {["Instagram", "Facebook", "Google"].map((s) => (
+          {SOCIAL.map((s) => (
             <a
-              key={s}
-              href={shop.instagram}
+              key={s.label}
+              href={s.href}
               target="_blank"
               rel="noreferrer"
               className="ui opacity-80 hover:opacity-100"
             >
-              {s}
+              {s.label}
             </a>
           ))}
         </div>
@@ -81,7 +88,7 @@ export function Footer() {
         <SplitText
           as="p"
           className="display px-[var(--gutter)] text-[clamp(2.75rem,11.5vw,12rem)]"
-          segments={[{ text: "Your chair is" }, { text: "waiting.", italic: true }]}
+          segments={[{ text: "Ваше кресло" }, { text: "уже ждёт.", italic: true }]}
           stagger={0.07}
         />
         {/* The sticky Book pill is ~76px off the bottom edge; without the
@@ -89,11 +96,11 @@ export function Footer() {
             on the site where content is guaranteed to sit under it. */}
         <div className="edge mt-8 flex flex-wrap items-center justify-between gap-4 pb-28 md:pb-10">
           <p className="label opacity-60">
-            © {shop.founded}—2026 {shop.name}. All rights reserved.
+            © {shop.founded}—2026 {shop.name}. Все права защищены.
           </p>
           <div className="flex gap-6">
-            <span className="label opacity-60">Privacy</span>
-            <span className="label opacity-60">Terms</span>
+            <span className="label opacity-60">Конфиденциальность</span>
+            <span className="label opacity-60">Условия</span>
           </div>
         </div>
       </div>

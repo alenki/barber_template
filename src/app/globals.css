@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 /* ============================================================
-   MAISON FADE — design tokens
+   МИЛЛИМЕТР — design tokens
    Three colours. No gradients. No shadows except one lifted pill.
    The whole system is: enormous type, enormous space, one signal colour.
+   Every fallback below carries Cyrillic — a Latin-only fallback would
+   drop the site into a substitute face mid-word on first paint.
    ============================================================ */
 
 @theme {
@@ -126,6 +128,10 @@
    TYPE PRIMITIVES
    ============================================================ */
 
+/* Playfair's `opsz` axis runs 5–1200: the higher it goes the thinner the
+   hairlines and the sharper the serifs. These headlines are set enormous, so
+   they want the display end of it — 96 is where the Didone contrast arrives
+   without the thins breaking up on a phone. */
 @utility display {
   font-family: var(--font-display);
   font-weight: 400;
@@ -143,7 +149,8 @@
   font-size: var(--text-mega);
   line-height: 0.78;
   letter-spacing: -0.045em;
-  font-variation-settings: "opsz" 96;
+  /* Bigger than `.display`, so it can take the axis further still. */
+  font-variation-settings: "opsz" 200;
 }
 
 @utility label {

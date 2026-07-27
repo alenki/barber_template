@@ -18,11 +18,11 @@ export function Ritual() {
   return (
     <section data-tone="ink" className="relative bg-ember text-ink">
       <div className="edge pt-[clamp(5rem,11vw,12rem)] pb-[clamp(6rem,13vw,14rem)]">
-        {/* Capped in em so it breaks after "The" at every viewport. */}
+        {/* Capped in em so it breaks after "Наш" at every viewport. */}
         <SplitText
           as="h2"
-          className="display max-w-[3em] text-[clamp(3.5rem,13.5vw,15rem)]"
-          segments={[{ text: "The" }, { text: "ritual", italic: true }]}
+          className="display max-w-[3.2em] text-[clamp(3.5rem,13.5vw,15rem)]"
+          segments={[{ text: "Наш" }, { text: "ритуал", italic: true }]}
         />
 
         <ol className="m-0 list-none p-0">

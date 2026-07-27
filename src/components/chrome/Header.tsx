@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { nav, shop, locations } from "@/lib/content";
+import { nav, shop, locations, BOOK_LABEL } from "@/lib/content";
 import { Wordmark } from "./Wordmark";
 import { useChromeTone } from "./useChromeTone";
 
@@ -54,7 +54,7 @@ export function Header() {
         <Link
           href="/"
           onClick={() => setOpen(false)}
-          aria-label={`${shop.name} — home`}
+          aria-label={`«${shop.name}» — на главную`}
           className="relative z-10"
         >
           <Wordmark />
@@ -73,9 +73,9 @@ export function Header() {
           onClick={() => setOpen((v) => !v)}
           className="ui relative z-10 md:hidden"
           aria-expanded={open}
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? "Закрыть меню" : "Открыть меню"}
         >
-          {open ? "Close" : "Menu"}
+          {open ? "Закрыть" : "Меню"}
         </button>
       </motion.header>
 
@@ -89,7 +89,7 @@ export function Header() {
             className="fixed inset-0 z-40 flex flex-col justify-between bg-ember text-ink edge pt-28 pb-10 md:hidden"
           >
             <nav className="flex flex-col">
-              {[...nav, { label: "Book", href: "/book" }].map((item, i) => (
+              {[...nav, { label: BOOK_LABEL, href: "/book" }].map((item, i) => (
                 <motion.div
                   key={item.href}
                   initial={{ opacity: 0, y: 28 }}

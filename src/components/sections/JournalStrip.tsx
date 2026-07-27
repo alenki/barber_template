@@ -19,11 +19,11 @@ export function JournalStrip() {
         <SplitText
           as="h2"
           className="mega -ml-[0.015em]"
-          segments={[{ text: "Journal" }]}
+          segments={[{ text: "Журнал" }]}
           stagger={0.06}
         />
         <Rise delay={0.2} className="shrink-0 pt-[0.6em]">
-          <p className="label max-w-[14ch] text-right">Notes from the chair</p>
+          <p className="label max-w-[16ch] text-right">Заметки из кресла</p>
         </Rise>
       </div>
 
@@ -54,7 +54,7 @@ export function JournalStrip() {
                     aria-hidden="true"
                     className="inline-block size-[5px] shrink-0 rounded-full bg-ember"
                   />
-                  <span className="label">{post.readMinutes} min read</span>
+                  <span className="label">{post.readMinutes} мин чтения</span>
                 </div>
 
                 <h3 className="display relative mt-4 pb-3 text-lg">
@@ -70,7 +70,7 @@ export function JournalStrip() {
                 </p>
 
                 <span className="ui mt-6 inline-block underline underline-offset-[6px]">
-                  Read
+                  Читать
                 </span>
               </Link>
             </Rise>
@@ -83,7 +83,7 @@ export function JournalStrip() {
           href="/journal"
           className="ui inline-flex items-center gap-3 border-b border-current/30 pb-1.5 transition-colors duration-500 ease-out-expo hover:border-current"
         >
-          The whole journal <span aria-hidden="true">→</span>
+          Весь журнал <span aria-hidden="true">→</span>
         </Link>
       </Rise>
     </section>

@@ -15,9 +15,9 @@ import { Frame } from "@/components/motion/Frame";
 
 /** Who was holding the clippers. Keyed to the barber ids in content.ts. */
 const WRITTEN_BY: Record<string, string> = {
-  "how-often-should-you-cut-your-hair": "amir",
-  "growing-it-out-one-more-month": "marco",
-  "everything-about-the-hot-towel": "theo",
+  "kak-chasto-strichsya": "artem",
+  "otrastit-eshchyo-mesyats": "roman",
+  "vsyo-o-goryachem-polotence": "gleb",
 };
 
 const authorFor = (post: Post) =>
@@ -40,7 +40,7 @@ export async function generateMetadata({
   const post = findPost(slug);
 
   if (!post) {
-    return { title: "Journal" };
+    return { title: "Журнал" };
   }
 
   return {
@@ -77,7 +77,7 @@ export default async function JournalPostPage({
           <Rise className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4">
             <span className="label">{post.category}</span>
             <span className="label">{post.date}</span>
-            <span className="label">{post.readMinutes} minute read</span>
+            <span className="label">{post.readMinutes} мин чтения</span>
           </Rise>
 
           {/* Roman, not italic. This headline is being read, not looked at. */}
@@ -117,9 +117,9 @@ export default async function JournalPostPage({
             is set at the size the prose is actually read at. */}
         <div className="mx-auto max-w-[62ch] text-[1.15rem]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4">
-            <span className="label">Words — {author.name}</span>
+            <span className="label">Текст — {author.name}</span>
             <span className="label text-ash">
-              Chair {author.chair} · {author.role}
+              Кресло {author.chair} · {author.role}
             </span>
           </div>
 
@@ -143,7 +143,7 @@ export default async function JournalPostPage({
           <div className="mt-12 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4 md:mt-16">
             <span className="label">{post.category}</span>
             <span className="label text-ash">
-              {shop.name} — {shop.city}, {shop.province}
+              {shop.name} — {shop.city}, {shop.country}
             </span>
           </div>
         </div>
@@ -152,12 +152,12 @@ export default async function JournalPostPage({
       {/* ---------------- Ember: the other two ---------------- */}
       <section data-tone="ink" className="slab bg-ember text-ink">
         <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-t border-current/20 pt-4">
-          <h2 className="label">More from the journal</h2>
+          <h2 className="label">Ещё из журнала</h2>
           <Link
             href="/journal"
             className="ui border-b border-current/30 pb-1 transition-colors duration-500 ease-out-expo hover:border-current"
           >
-            Every entry
+            Все записи
           </Link>
         </div>
 
@@ -184,7 +184,7 @@ export default async function JournalPostPage({
                       aria-hidden="true"
                       className="inline-block size-[5px] shrink-0 rounded-full bg-ink"
                     />
-                    <span className="label">{other.readMinutes} min read</span>
+                    <span className="label">{other.readMinutes} мин чтения</span>
                   </div>
 
                   <h3 className="display relative mt-4 max-w-[18ch] pb-3 text-lg italic">

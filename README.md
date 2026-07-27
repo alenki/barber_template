@@ -1,69 +1,89 @@
-# Maison Fade
+# Миллиметр
 
-A barbershop website. Fictional shop, real build — meant to be shown to barbershops as
-an example, or rebranded into an actual client site in an afternoon.
+Сайт барбершопа. Барбершоп вымышленный, сборка настоящая — сделан как образец,
+который показывают барбершопам, или как основа, из которой за полдня собирается
+сайт реального клиента.
 
-Montréal, three rooms, five chairs, six services. None of it exists.
+Москва, три зала, пять кресел, шесть услуг. Ничего из этого не существует.
 
 ---
 
-## Running it
+## Запуск
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # production build
+npm run build    # продакшен-сборка
 ```
 
-Node 20.19+ / 22.13+ recommended.
+Рекомендуется Node 20.19+ / 22.13+.
 
-## Stack
+## Стек
 
 | | |
 | --- | --- |
-| Framework | Next.js 16, App Router, TypeScript |
-| Styling | Tailwind CSS v4 (`@theme` tokens in `src/app/globals.css`) |
-| Motion | [Motion](https://motion.dev) (`motion/react`) |
-| Fonts | Bodoni Moda + Courier Prime via `next/font/google`, General Sans self-hosted in `public/fonts` |
-| Images | Pexels, downloaded to `public/img` — free for commercial use, no attribution required |
+| Фреймворк | Next.js 16, App Router, TypeScript |
+| Стили | Tailwind CSS v4 (токены `@theme` в `src/app/globals.css`) |
+| Анимация | [Motion](https://motion.dev) (`motion/react`) |
+| Шрифты | Playfair + IBM Plex Mono + Onest через `next/font/google` |
+| Изображения | Pexels, скачаны в `public/img` — бесплатны для коммерческого использования, атрибуция не требуется |
 
-## Rebranding it
+Все три гарнитуры подключены с подмножеством `cyrillic`. Это не косметика:
+латинский набор из предыдущей версии (Bodoni Moda, Courier Prime, General Sans)
+кириллицы не содержит вовсе, и русский текст в нём подменялся системным шрифтом
+прямо посреди слова. IBM Plex Mono выбран вместо более «машинописного» Cousine
+по одной причине — у Cousine нет знака ₽, а цены на этом сайте набраны в
+подписях именно им.
 
-Almost everything a shop would want to change lives in **one file**: `src/lib/content.ts`.
-Shop name, city, contact details, services and prices, barbers, locations and hours,
-testimonials, FAQs and journal posts all come from there. No copy is hardcoded in a
-component.
+## Ребрендинг
 
-To change the look, `src/app/globals.css` holds the entire design system as tokens —
-three colours and three typefaces. Swapping `--color-ember` recolours the whole site.
+Почти всё, что захочет поменять реальный барбершоп, лежит в **одном файле**:
+`src/lib/content.ts`. Название, город, контакты, услуги и цены, мастера, адреса
+и часы работы, отзывы, вопросы и записи журнала — всё оттуда. Ни одна строка
+копирайта не зашита в компонент.
 
-`DESIGN.md` documents the rules the site is built to. Read it before adding anything.
+Внешний вид — `src/app/globals.css`: вся дизайн-система лежит там токенами,
+три цвета и три гарнитуры. Подмена `--color-ember` перекрашивает весь сайт.
 
-## Structure
+Русская грамматика вынесена в `src/lib/words.ts`: числительные с родом
+(`spell`), выбор формы существительного при числе (`plural`, `count`) и формат
+рублей (`money`). Компоненты не знают этих правил — они вызывают хелперы.
+
+`DESIGN.md` описывает правила, по которым собран сайт. Прочитайте его, прежде
+чем что-то добавлять.
+
+## Структура
 
 ```
 src/
   app/
-    page.tsx              home — the long scroll
-    services/             full price list and policies
-    barbers/              the five chairs
-    book/                 five-step booking flow
-    journal/              index + [slug] post template
+    page.tsx              главная — длинный скролл
+    services/             полный прайс и правила
+    barbers/              пять кресел
+    book/                 запись в пять шагов
+    journal/              список + шаблон записи [slug]
   components/
-    chrome/               header, footer, sticky book pill, wordmark
-    motion/               SplitText, Frame, Marquee — the shared primitives
-    sections/             the home page slabs
-    book/                 the booking flow
+    chrome/               шапка, подвал, липкая кнопка записи, логотип
+    motion/               SplitText, Frame, Marquee — общие примитивы
+    sections/             блоки главной
+    book/                 форма записи
   lib/
-    content.ts            every word and price on the site
-    fonts.ts              the type stack
+    content.ts            каждое слово и каждая цена на сайте
+    words.ts              числительные, склонения, рубли
+    fonts.ts              гарнитуры
 ```
 
-## Notes
+## Заметки
 
-- The booking flow is a front-end demonstration. It validates input and produces a
-  deterministic reference code, but nothing is submitted anywhere and no appointment
-  is made. Wiring it to a real system means replacing one submit handler.
-- Photography is placeholder. A real shop should shoot its own room and its own barbers —
-  it is the single biggest upgrade available to any barbershop site.
-- The logo mark is a fade drawn literally: bars stepping from solid to hairline.
+- Форма записи — фронтенд-демонстрация. Она проверяет ввод и выдаёт
+  детерминированный номер брони, но никуда ничего не отправляет и записи не
+  создаёт. Чтобы подключить её к реальной системе, нужно заменить один
+  обработчик отправки.
+- Часы работы в `content.ts` разбираются кодом, а не дублируются в нём:
+  `src/components/book/schedule.ts` понимает и «Пн — Пт», и «Суббота», и
+  «Выходной» (а также английские подписи, если таблицу оставят непереведённой).
+  Меняя формат подписей, проверьте, что дни недели по-прежнему распознаются.
+- Фотографии — заглушки. Реальному барбершопу стоит снять свой зал и своих
+  мастеров: это самое большое улучшение, доступное любому сайту барбершопа.
+- Знак логотипа — это фейд, нарисованный буквально: полосы, сходящие от
+  сплошной к волосяной.

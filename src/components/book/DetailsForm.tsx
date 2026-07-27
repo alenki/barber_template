@@ -16,9 +16,9 @@ const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
 /* The house voice, applied to being told off. Short, flat, never scolding. */
 const COMPLAINT: Record<FieldName, string> = {
-  name: "We need a name to put on the chair.",
-  email: "That address is missing something — check it over.",
-  phone: "A number we can reach you on, ten digits or more.",
+  name: "Нам нужно имя, чтобы записать его на кресло.",
+  email: "В этом адресе чего-то не хватает — проверьте.",
+  phone: "Номер, по которому вас можно набрать: не меньше десяти цифр.",
 };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -92,8 +92,8 @@ export function DetailsForm({
     <form noValidate onSubmit={handleSubmit} className="max-w-[38rem]">
       <Field
         id={`${baseId}-name`}
-        label="Name"
-        hint="Whatever we should call you"
+        label="Имя"
+        hint="Как к вам обращаться"
         error={errors.name}
       >
         {(props) => (
@@ -112,8 +112,8 @@ export function DetailsForm({
 
       <Field
         id={`${baseId}-email`}
-        label="Email"
-        hint="For the reminder, nothing else"
+        label="Почта"
+        hint="Только для напоминания, больше ни для чего"
         error={errors.email}
       >
         {(props) => (
@@ -133,8 +133,8 @@ export function DetailsForm({
 
       <Field
         id={`${baseId}-phone`}
-        label="Phone"
-        hint="In case the barber runs late"
+        label="Телефон"
+        hint="На случай, если мастер задержится"
         error={errors.phone}
       >
         {(props) => (
@@ -154,8 +154,8 @@ export function DetailsForm({
 
       <Field
         id={`${baseId}-note`}
-        label="Anything we should know"
-        hint="Optional"
+        label="Что нам стоит знать"
+        hint="Необязательно"
       >
         {(props) => (
           <textarea

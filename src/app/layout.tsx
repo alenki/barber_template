@@ -8,17 +8,17 @@ import { StickyBook } from "@/components/chrome/StickyBook";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://maisonfade.ca"),
+  metadataBase: new URL("https://millimetr.ru"),
   title: {
-    default: `${shop.name} — Barbershop, ${shop.city}`,
+    default: `${shop.name} — барбершоп, ${shop.city}`,
     template: `%s — ${shop.name}`,
   },
   description: shop.description,
   openGraph: {
-    title: `${shop.name} — Barbershop, ${shop.city}`,
+    title: `${shop.name} — барбершоп, ${shop.city}`,
     description: shop.description,
     type: "website",
-    locale: "en_CA",
+    locale: "ru_RU",
     images: ["/img/hero-chair.jpg"],
   },
   icons: {
@@ -40,7 +40,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en"
+      lang="ru"
       className={`${display.variable} ${sans.variable} ${typewriter.variable}`}
     >
       <body>

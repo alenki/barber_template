@@ -11,13 +11,13 @@ import type { Details } from "./DetailsForm";
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
 /**
- * "Held." set to the exact width of the column. The word draws roughly
- * 2.55em wide in Bodoni Moda italic at the `.mega` tracking, so dividing the
- * container's inline size by 2.6 fills the line edge to edge. Overriding the
+ * "Готово." set to the exact width of the column. The word draws roughly
+ * 2.833em wide in Playfair italic at the `.mega` tracking, so dividing the
+ * container's inline size by 2.87 fills the line edge to edge. Overriding the
  * token keeps the `.mega` utility itself intact, and `cqw` rather than `vw`
  * means a desktop scrollbar can never push the line wide.
  */
-const MEGA_FIT = { "--text-mega": "calc(100cqw / 2.62)" } as CSSProperties;
+const MEGA_FIT = { "--text-mega": "calc(100cqw / 2.87)" } as CSSProperties;
 const MEGA_CONTAINER = { containerType: "inline-size" } as CSSProperties;
 
 export type Booking = {
@@ -46,26 +46,26 @@ export function Confirmation({
   )}`;
 
   const lines: { label: string; value: string }[] = [
-    { label: "Room", value: booking.room },
-    { label: "Address", value: booking.roomAddress },
-    { label: "Service", value: booking.service },
-    { label: "Chair", value: booking.chair },
-    { label: "Day", value: booking.dateLabel },
-    { label: "Hour", value: slotWindow },
-    { label: "Name", value: booking.details.name },
-    { label: "Email", value: booking.details.email },
-    { label: "Phone", value: booking.details.phone },
+    { label: "Зал", value: booking.room },
+    { label: "Адрес", value: booking.roomAddress },
+    { label: "Услуга", value: booking.service },
+    { label: "Кресло", value: booking.chair },
+    { label: "День", value: booking.dateLabel },
+    { label: "Время", value: slotWindow },
+    { label: "Имя", value: booking.details.name },
+    { label: "Почта", value: booking.details.email },
+    { label: "Телефон", value: booking.details.phone },
   ];
 
   if (booking.details.note) {
-    lines.push({ label: "Note", value: booking.details.note });
+    lines.push({ label: "Комментарий", value: booking.details.note });
   }
 
   return (
     <div>
       <Rise animateOnMount className="border-t border-current/20 pt-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <span className="label">Reference {booking.reference}</span>
+          <span className="label">Бронь {booking.reference}</span>
           <span className="label opacity-55">
             {booking.dateLabel} · {clock(booking.start)}
           </span>
@@ -80,7 +80,7 @@ export function Confirmation({
             stagger={0.08}
             duration={1.1}
             className="mega whitespace-nowrap"
-            segments={[{ text: "Held." }]}
+            segments={[{ text: "Готово." }]}
           />
         </div>
       </div>
@@ -109,13 +109,13 @@ export function Confirmation({
 
           <div className="mt-[clamp(2rem,4vw,3rem)] flex items-end justify-between gap-6 border-t border-current/20 pt-5">
             <div>
-              <span className="label opacity-55">Total</span>
-              <span className="display mt-2 block text-[clamp(2.25rem,5vw,4rem)] leading-none">
+              <span className="label opacity-55">Итого</span>
+              <span className="display mt-2 block text-[clamp(2.25rem,5vw,4rem)] leading-none whitespace-nowrap">
                 {money(booking.price)}
               </span>
             </div>
             <div className="text-right">
-              <span className="label opacity-55">In the chair</span>
+              <span className="label opacity-55">В кресле</span>
               <span className="display mt-2 block text-[clamp(1.35rem,2.4vw,2rem)] leading-none italic">
                 {duration(booking.minutes)}
               </span>
@@ -123,7 +123,8 @@ export function Confirmation({
           </div>
 
           <p className="label mt-4 opacity-55">
-            Nothing charged now. Settle in the chair, card or cash.
+            Сейчас ничего не списано. Рассчитаетесь в кресле — картой или
+            наличными.
           </p>
         </Rise>
 
@@ -134,16 +135,16 @@ export function Confirmation({
           className="md:col-span-4 md:col-start-9"
         >
           <div className="flex size-[clamp(11rem,20vw,16rem)] flex-col items-center justify-center gap-2 rounded-full bg-ink text-ember">
-            <span className="label opacity-60">Your reference</span>
+            <span className="label opacity-60">Номер брони</span>
             <span className="display text-[clamp(1.25rem,2.4vw,2rem)] italic">
               {booking.reference}
             </span>
           </div>
 
-          <p className="note mt-[clamp(2rem,4vw,3rem)] max-w-[32ch] opacity-75">
-            Quote it if you need to move the hour. Free to change up to six
-            hours before; inside that, the chair was held for you and nobody
-            else could have it.
+          <p className="note mt-[clamp(2rem,4vw,3rem)] max-w-[34ch] opacity-75">
+            Назовите его, если нужно перенести время. Бесплатно не позже чем за
+            шесть часов; внутри этого срока кресло держали для вас, и занять его
+            не мог никто другой.
           </p>
 
           <a
@@ -159,7 +160,7 @@ export function Confirmation({
       <div className="mt-[clamp(3rem,7vw,6rem)]">
         <Frame
           src={booking.roomImage}
-          alt={`The ${booking.room} room at ${shop.name}, ${booking.roomAddress}`}
+          alt={`Зал «${booking.room}» в «${shop.name}», ${booking.roomAddress}`}
           animateOnMount
           delay={0.35}
           parallax={6}
@@ -176,11 +177,10 @@ export function Confirmation({
         className="mt-[clamp(2.5rem,5vw,4rem)] border-t border-current/20 pt-5"
       >
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
-          <p className="note max-w-[46ch] opacity-70">
-            This booking flow is a demonstration. No appointment has been made,
-            no email has been sent, and nothing has been charged — the details
-            above exist only in this browser tab. {shop.name} is a fictional
-            shop in {shop.city}.
+          <p className="note max-w-[48ch] opacity-70">
+            Эта форма записи — демонстрация. Запись не создана, письмо не
+            отправлено и ничего не списано: данные выше существуют только в этой
+            вкладке браузера. «{shop.name}» — вымышленный барбершоп {shop.cityIn}.
           </p>
 
           <div className="flex shrink-0 flex-wrap items-center gap-8">
@@ -189,7 +189,7 @@ export function Confirmation({
               onClick={onRestart}
               className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-opacity duration-500 hover:opacity-60"
             >
-              Book another
+              Записаться ещё
               <span
                 aria-hidden="true"
                 className={`inline-block transition-transform duration-500 ${EASE_CLASS} group-hover:translate-x-1`}
@@ -201,7 +201,7 @@ export function Confirmation({
               href="/"
               className="ui border-b border-current/30 pb-2 transition-opacity duration-500 hover:opacity-60"
             >
-              Back to the shop
+              На главную
             </Link>
           </div>
         </div>

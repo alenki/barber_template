@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import {
   clock,
+  CLOSED,
   dayLabel,
   freeCount,
   monthShort,
@@ -17,6 +18,7 @@ import {
   type Room,
   type Treatment,
 } from "./schedule";
+import { plural } from "@/lib/words";
 
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
@@ -74,7 +76,7 @@ export function TimeStep({
 
   if (!days.length) {
     return (
-      <p className="label opacity-55">Opening the diary…</p>
+      <p className="label opacity-55">Открываем запись…</p>
     );
   }
 
@@ -85,7 +87,10 @@ export function TimeStep({
     <div>
       {/* ---------------------------------------------------------- days */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-current/20 pt-4">
-        <span className="label">Next {spell(days.length).toLowerCase()} days</span>
+        <span className="label">
+          Ближайшие {spell(days.length, "m").toLowerCase()}{" "}
+          {plural(days.length, "день", "дня", "дней")}
+        </span>
         <span className="label opacity-55">{room.name}</span>
       </div>
 
@@ -120,9 +125,9 @@ export function TimeStep({
                   {String(d.dayOfMonth).padStart(2, "0")}
                 </span>
                 <span className="label leading-none opacity-55">
-                  {closed ? "Closed" : monthShort(d)}
+                  {closed ? CLOSED : monthShort(d)}
                 </span>
-                {i === 0 ? <span className="sr-only">Today</span> : null}
+                {i === 0 ? <span className="sr-only">Сегодня</span> : null}
               </button>
             </li>
           );
@@ -133,22 +138,21 @@ export function TimeStep({
       <div className="mt-[clamp(2.5rem,5vw,4rem)]">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-current/20 pt-4">
           <span className="label">
-            {day ? dayLabel(day) : "Pick a day"}
+            {day ? dayLabel(day) : "Выберите день"}
             {opening?.window ? ` · ${opening.time}` : ""}
           </span>
           <span className="label opacity-55" role="status">
             {day
               ? free === 0
-                ? "No hours left"
-                : `${free} of ${slots.length} hours free`
+                ? "Свободных часов нет"
+                : `Свободно ${free} из ${slots.length}`
               : ""}
           </span>
         </div>
 
         {slots.length === 0 ? (
-          <p className="note mt-6 max-w-[34ch] opacity-70">
-            This room is closed that day. Choose another, or try a different
-            room.
+          <p className="note mt-6 max-w-[36ch] opacity-70">
+            В этот день зал не работает. Выберите другой день или другой зал.
           </p>
         ) : (
           <ul className="m-0 mt-6 grid list-none grid-cols-3 gap-[6px] p-0 sm:grid-cols-4 md:mt-8 md:grid-cols-5">
@@ -177,7 +181,7 @@ export function TimeStep({
                       {clock(slot.start)}
                     </span>
                     <span className="label leading-none opacity-60">
-                      {slot.taken ? "Taken" : `— ${clock(slot.end)}`}
+                      {slot.taken ? "Занято" : `— ${clock(slot.end)}`}
                     </span>
                   </button>
                 </li>

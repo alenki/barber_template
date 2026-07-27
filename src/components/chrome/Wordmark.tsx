@@ -1,3 +1,5 @@
+import { shop } from "@/lib/content";
+
 /**
  * The mark is a fade, drawn literally: five bars stepping from solid to hairline.
  * It is the only illustration on the site, and it means something.
@@ -31,7 +33,7 @@ export function Wordmark({ className = "" }: { className?: string }) {
     <span className={`flex items-center gap-2.5 ${className}`}>
       <FadeMark className="h-[0.95em] w-auto shrink-0" />
       <span className="ui text-[0.82rem] leading-none tracking-[0.14em] whitespace-nowrap">
-        Maison Fade
+        {shop.name}
       </span>
     </span>
   );

@@ -16,15 +16,13 @@ export type Treatment = (typeof services)[number];
 /* ------------------------------------------------------------------ words */
 
 
-export { spell } from "@/lib/words";
-
-export const money = (n: number) => `$${n}`;
+export { spell, money } from "@/lib/words";
 
 export const duration = (min: number) => {
-  if (min < 60) return `${min} min`;
+  if (min < 60) return `${min} мин`;
   const h = Math.floor(min / 60);
   const m = min % 60;
-  return m ? `${h} hr ${m} min` : `${h} hr`;
+  return m ? `${h} ч ${m} мин` : `${h} ч`;
 };
 
 /**
@@ -33,32 +31,51 @@ export const duration = (min: number) => {
  */
 export const ANY_CHAIR = {
   id: "any",
-  chair: "Any",
-  name: "Whoever is free",
-  role: "No preference",
-  detail: "We give you the chair best suited to the service you picked.",
+  chair: "—",
+  name: "Кто свободен",
+  role: "Без предпочтений",
+  detail: "Дадим кресло, которое лучше подходит под выбранную услугу.",
 } as const;
 
 /* ------------------------------------------------------------------ dates */
 
 export const DAY_COUNT = 14;
 
-export const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-const WEEKDAY_KEY = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+export const WEEKDAY = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"] as const;
+
+/**
+ * How an hours label in content.ts names each weekday. Russian abbreviations
+ * are not prefixes of the full words — "суббота" does not contain "сб" — so a
+ * single key per day is not enough and each one carries its alternates. The
+ * English keys are kept so an untranslated hours table still parses.
+ */
+const WEEKDAY_KEY: readonly (readonly string[])[] = [
+  ["воскрес", "вс", "sun"],
+  ["понедельн", "пн", "mon"],
+  ["вторн", "вт", "tue"],
+  ["сред", "ср", "wed"],
+  ["четв", "чт", "thu"],
+  ["пятн", "пт", "fri"],
+  ["суббот", "сб", "sat"],
+];
+
 const MONTH = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  "янв",
+  "фев",
+  "мар",
+  "апр",
+  "мая",
+  "июн",
+  "июл",
+  "авг",
+  "сен",
+  "окт",
+  "ноя",
+  "дек",
 ] as const;
+
+/** What a room shows on a day it does not open. */
+export const CLOSED = "Выходной";
 
 export type Day = {
   iso: string;
@@ -98,14 +115,21 @@ export const monthShort = (day: Day) => MONTH[day.month];
 
 /**
  * Reads the hours table in content.ts rather than restating it. A label is
- * either a single day ("Saturday") or a range ("Mon — Fri"); both resolve to
+ * either a single day ("Суббота") or a range ("Пн — Пт"); both resolve to
  * the set of weekday numbers they cover.
  */
 function weekdaysOf(label: string): number[] {
   const l = label.toLowerCase();
-  const hits = WEEKDAY_KEY.map((k, i) => ({ i, at: l.indexOf(k) })).filter(
-    (h) => h.at >= 0
-  );
+  const hits = WEEKDAY_KEY.map((keys, i) => {
+    /* The earliest alternate that appears is where this day sits in the
+       label, which is what orders the two ends of a range. */
+    const at = keys
+      .map((k) => l.indexOf(k))
+      .filter((n) => n >= 0)
+      .sort((a, b) => a - b)[0];
+    return { i, at: at ?? -1 };
+  }).filter((h) => h.at >= 0);
+
   if (hits.length === 2 && /[—–-]/.test(l)) {
     hits.sort((a, b) => a.at - b.at);
     const out: number[] = [];
@@ -118,7 +142,7 @@ function weekdaysOf(label: string): number[] {
   return hits.map((h) => h.i);
 }
 
-/** "10:00 — 20:00" → [600, 1200]. "Closed" → null. */
+/** "10:00 — 20:00" → [600, 1200]. "Выходной" → null. */
 function windowOf(time: string): [number, number] | null {
   const m = time.match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
   if (!m) return null;
@@ -133,7 +157,7 @@ export type Opening = { time: string; window: [number, number] | null };
 export function openingFor(room: Room, weekday: number): Opening {
   const entry =
     room.hours.find((h) => weekdaysOf(h.days).includes(weekday)) ?? null;
-  if (!entry) return { time: "Closed", window: null };
+  if (!entry) return { time: CLOSED, window: null };
   return { time: entry.time, window: windowOf(entry.time) };
 }
 
@@ -230,7 +254,9 @@ export const freeCount = (slots: Slot[]) => slots.filter((s) => !s.taken).length
 
 /* -------------------------------------------------------------- reference */
 
-const CODE_LETTERS = "ACDEFHJKLMNPRTUVWXY";
+/* Cyrillic, because the code gets read down a phone. О, З and Ч are left out —
+   they are heard as nought, three and four. */
+const CODE_LETTERS = "АБВГДЕЖКЛМНПРСТУФХЦШЭЮЯ";
 
 /**
  * FNV-1a over the choices. Not random, not sequential — the same booking
@@ -246,5 +272,5 @@ export function referenceCode(parts: (string | number | null)[]) {
   h >>>= 0;
   const a = CODE_LETTERS[h % CODE_LETTERS.length];
   const b = CODE_LETTERS[Math.floor(h / CODE_LETTERS.length) % CODE_LETTERS.length];
-  return `MF-${a}${b}-${String(h % 10000).padStart(4, "0")}`;
+  return `МЛ-${a}${b}-${String(h % 10000).padStart(4, "0")}`;
 }

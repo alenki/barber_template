@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { locations, services, shop } from "@/lib/content";
 import { BookingFlow } from "@/components/book/BookingFlow";
+import { count, money } from "@/lib/words";
 
 export const metadata: Metadata = {
-  title: "Book",
-  description: `Book a chair at ${shop.name} in ${shop.city}. Five steps: the room, the service, the barber, the hour and your name. ${services.length} services across ${locations.length} rooms, from $${Math.min(
-    ...services.map((s) => s.price)
+  title: "Запись",
+  description: `Забронировать кресло в «${shop.name}» ${shop.cityIn}. Пять шагов: зал, услуга, мастер, время и ваше имя. ${count(
+    services.length,
+    "услуга",
+    "услуги",
+    "услуг"
+  )} в ${count(locations.length, "зале", "залах", "залах")}, от ${money(
+    Math.min(...services.map((s) => s.price))
   )}.`,
 };
 
@@ -32,7 +38,7 @@ function BookingFallback() {
     >
       <div className="edge pt-[clamp(6.5rem,17svh,11rem)]">
         <div className="border-t border-current/20 pt-4">
-          <p className="label">Step 01 / 05 — The room</p>
+          <p className="label">Шаг 01 / 05 — Зал</p>
         </div>
       </div>
     </section>

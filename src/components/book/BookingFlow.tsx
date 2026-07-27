@@ -31,6 +31,7 @@ import {
   todaySnapshot,
   type Day,
 } from "./schedule";
+import { count, money, plural, years as spellYears } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
@@ -45,41 +46,51 @@ const DONE = STEP_COUNT + 1;
 
 const STEPS = [
   {
-    eyebrow: "The room",
-    roman: `${spell(locations.length)} rooms.`,
-    italic: "Pick one.",
-    note: "Same prices and the same chairs in all three. The hours differ a little, and Sunday differs the most.",
+    eyebrow: "Зал",
+    roman: `${spell(locations.length, "m")} ${plural(
+      locations.length,
+      "зал",
+      "зала",
+      "залов"
+    )}.`,
+    italic: "Выберите один.",
+    note: "Цены и кресла во всех трёх одинаковые. Часы работы немного разные, а воскресенье отличается сильнее всего.",
   },
   {
-    eyebrow: "The service",
-    roman: "What are you",
-    italic: "having?",
-    note: `One service, one sitting. For two in the same chair — a cut and a shave together — call ${shop.phone} and we will set it up by hand.`,
+    eyebrow: "Услуга",
+    roman: "Что будем",
+    italic: "делать?",
+    note: `Одна услуга — одна посадка. Если нужно две подряд в одном кресле — стрижка и бритьё вместе — позвоните на ${shop.phone}, и мы соберём запись вручную.`,
   },
   {
-    eyebrow: "The chair",
-    roman: "Whose",
-    italic: "hands?",
-    note: "Ask for a name or leave it to us. Nobody here is interchangeable, and nobody here is a compromise.",
+    eyebrow: "Кресло",
+    roman: "В чьи",
+    italic: "руки?",
+    note: "Назовите имя или оставьте выбор нам. Здесь никто не взаимозаменяем и никто не компромисс.",
   },
   {
-    eyebrow: "The hour",
-    roman: "When can you",
-    italic: "sit down?",
-    note: `${spell(DAY_COUNT)} days ahead. The hours already spoken for are greyed out and cannot be picked.`,
+    eyebrow: "Время",
+    roman: "Когда вам",
+    italic: "удобно сесть?",
+    note: `${spell(DAY_COUNT, "m")} ${plural(
+      DAY_COUNT,
+      "день",
+      "дня",
+      "дней"
+    )} вперёд. Занятые часы показаны серым, выбрать их нельзя.`,
   },
   {
-    eyebrow: "You",
-    roman: "Who are we",
-    italic: "holding it for?",
-    note: "Nothing is charged now. You settle at the end, card or cash, and you can move the hour free up to six hours before.",
+    eyebrow: "Вы",
+    roman: "Для кого",
+    italic: "держим кресло?",
+    note: "Сейчас ничего не списывается. Рассчитаетесь в конце — картой или наличными, а перенести время бесплатно можно не позже чем за шесть часов.",
   },
 ] as const;
 
-const SUBMIT_LABEL = "Hold the chair";
+const SUBMIT_LABEL = "Держим кресло";
 
-/* "Barber · Shave Specialist" reads badly mid-sentence in alt text. */
-const readableRole = (role: string) => role.replace(" · ", " and ");
+/* "Барбер · Мастер бритья" reads badly mid-sentence in alt text. */
+const readableRole = (role: string) => role.replace(" · ", ", ");
 
 /* ------------------------------------------------------------------ */
 
@@ -231,13 +242,13 @@ export function BookingFlow() {
   /* ------------------------------------------------------------ summary */
 
   const rows: SummaryRow[] = [
-    { key: "room", label: "Room", value: room?.name ?? null, step: 1 },
-    { key: "service", label: "Service", value: service?.name ?? null, step: 2 },
-    { key: "chair", label: "Chair", value: chairName, step: 3 },
-    { key: "day", label: "Day", value: day ? dayLabel(day) : null, step: 4 },
+    { key: "room", label: "Зал", value: room?.name ?? null, step: 1 },
+    { key: "service", label: "Услуга", value: service?.name ?? null, step: 2 },
+    { key: "chair", label: "Кресло", value: chairName, step: 3 },
+    { key: "day", label: "День", value: day ? dayLabel(day) : null, step: 4 },
     {
       key: "time",
-      label: "Hour",
+      label: "Время",
       value: chosen.time === null ? null : clock(chosen.time),
       step: 4,
     },
@@ -259,8 +270,8 @@ export function BookingFlow() {
         <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
           <p className="label" role="status" aria-live="polite">
             {done
-              ? "Booked"
-              : `Step ${String(step).padStart(2, "0")} / ${String(
+              ? "Готово"
+              : `Шаг ${String(step).padStart(2, "0")} / ${String(
                   STEP_COUNT
                 ).padStart(2, "0")} — ${current.eyebrow}`}
           </p>
@@ -279,7 +290,7 @@ export function BookingFlow() {
               >
                 ←
               </span>
-              Back
+              Назад
             </button>
           ) : (
             <span className="label opacity-55">{shop.city}</span>
@@ -424,7 +435,7 @@ function StepBody({
               title={location.name}
               detail={location.address}
               aside={location.city}
-              valueNote={`${location.chairs} chairs`}
+              valueNote={count(location.chairs, "кресло", "кресла", "кресел")}
               selected={chosen.location === location.id}
               onSelect={() => onLocation(location.id)}
             />
@@ -432,7 +443,7 @@ function StepBody({
         </ul>
         {held ? (
           <p className="label mt-6 opacity-60">
-            Chair {held.chair} — {held.name} is already held for you.
+            Кресло {held.chair} — {held.name}: уже выбрано за вас.
           </p>
         ) : null}
       </>
@@ -447,9 +458,9 @@ function StepBody({
             key={s.id}
             index={s.index}
             title={s.name}
-            detail={`${s.minutes} minutes`}
+            detail={`${s.minutes} мин`}
             aside={s.blurb}
-            value={`$${s.price}`}
+            value={money(s.price)}
             selected={chosen.service === s.id}
             onSelect={() => onService(s.id)}
           />
@@ -471,9 +482,9 @@ function StepBody({
               <span className="relative block size-[clamp(3.25rem,5.5vw,4.75rem)] overflow-hidden rounded-[10px] bg-ink/10">
                 <Image
                   src={b.image}
-                  alt={`Portrait of ${b.name}, ${readableRole(b.role)} at ${
+                  alt={`Портрет: ${b.name}, ${readableRole(b.role)} в «${
                     shop.name
-                  }`}
+                  }»`}
                   fill
                   sizes="96px"
                   className="object-cover"
@@ -484,7 +495,7 @@ function StepBody({
             title={b.name}
             detail={b.role}
             aside={b.specialties.join(" · ")}
-            valueNote={`${b.years} yrs`}
+            valueNote={spellYears(b.years)}
             selected={chosen.barber === b.id}
             onSelect={() => onBarber(b.id)}
           />
@@ -495,7 +506,7 @@ function StepBody({
           index="—"
           media={
             <span className="grid size-[clamp(3.25rem,5.5vw,4.75rem)] place-items-center rounded-[10px] border border-current/25">
-              <span className="label leading-none opacity-70">Any</span>
+              <span className="label leading-none opacity-70">Любой</span>
             </span>
           }
           title={ANY_CHAIR.name}

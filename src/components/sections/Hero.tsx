@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { hero, shop } from "@/lib/content";
+import { hero, locations, shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
 
@@ -17,7 +17,7 @@ export function Hero() {
           animateOnMount
           delay={0.3}
           stagger={0.05}
-          className="display mx-auto max-w-[16ch] text-center text-hero"
+          className="display mx-auto max-w-[19ch] text-center text-hero"
           segments={[{ text: hero.roman }, { text: hero.italic, italic: true }]}
         />
 
@@ -37,7 +37,7 @@ export function Hero() {
       <div className="edge mt-12 md:mt-16">
         <Frame
           src="/img/hero-chair.jpg"
-          alt={`Inside ${shop.name} on Saint-Denis`}
+          alt={`Зал «${shop.name}» на ${locations[0].address}`}
           priority
           animateOnMount
           delay={1.15}
@@ -54,7 +54,7 @@ export function Hero() {
         transition={{ duration: 1, delay: 1.8 }}
         className="edge flex items-center justify-between py-6"
       >
-        <span className="label">Scroll</span>
+        <span className="label">Листайте</span>
         <motion.span
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}

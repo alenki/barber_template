@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
+import { BOOK_LABEL } from "@/lib/content";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -29,8 +30,10 @@ export function StickyBook() {
         <span className="absolute inset-0 translate-y-full bg-ember transition-transform duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0" />
         <span className="ui relative z-10 block h-[14px] overflow-hidden leading-[14px]">
           <span className="block transition-transform duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-[14px]">
-            <span className="block h-[14px] whitespace-nowrap">Book now</span>
-            <span className="block h-[14px] whitespace-nowrap text-ink">Book now</span>
+            <span className="block h-[14px] whitespace-nowrap">{BOOK_LABEL}</span>
+            <span className="block h-[14px] whitespace-nowrap text-ink">
+              {BOOK_LABEL}
+            </span>
           </span>
         </span>
       </Link>

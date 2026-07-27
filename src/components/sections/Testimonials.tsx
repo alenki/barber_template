@@ -6,6 +6,8 @@ import type { PanInfo } from "motion/react";
 import { shop, testimonials } from "@/lib/content";
 import { Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
+/* Aliased: `count` is already the number of reviews in this component. */
+import { count as countOf } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -111,13 +113,13 @@ export function Testimonials() {
           </span>
           <span className="flex min-w-0 flex-col">
             <span id="testimonials-eyebrow" className="label">
-              What people say
+              Что говорят
             </span>
-            {/* Deliberately not "on Google": the shop is invented, and a
+            {/* Deliberately not "на Яндексе": the shop is invented, and a
                 template should not ship a fabricated third-party rating that
                 a real barbershop might publish unchanged. */}
             <span className="label text-ash">
-              {RATING} average · {count} reviews
+              {RATING} в среднем · {countOf(count, "отзыв", "отзыва", "отзывов")}
             </span>
           </span>
         </Rise>
@@ -127,7 +129,7 @@ export function Testimonials() {
             type="button"
             onClick={() => goTo(index - 1)}
             disabled={index === 0}
-            aria-label="Previous review"
+            aria-label="Предыдущий отзыв"
             className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/25 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-ink enabled:hover:bg-ink enabled:hover:text-paper disabled:opacity-20 md:h-14 md:w-14"
           >
             <span aria-hidden="true" className="text-[1.05rem]">
@@ -138,7 +140,7 @@ export function Testimonials() {
             type="button"
             onClick={() => goTo(index + 1)}
             disabled={index >= maxIndex}
-            aria-label="Next review"
+            aria-label="Следующий отзыв"
             className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/25 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-ink enabled:hover:bg-ink enabled:hover:text-paper disabled:opacity-20 md:h-14 md:w-14"
           >
             <span aria-hidden="true" className="text-[1.05rem]">
@@ -154,7 +156,7 @@ export function Testimonials() {
         className="mt-16 overflow-hidden md:mt-28"
         role="group"
         aria-roledescription="carousel"
-        aria-label="Client reviews"
+        aria-label="Отзывы клиентов"
       >
         <motion.div
           style={{ x }}
@@ -170,12 +172,12 @@ export function Testimonials() {
               key={t.name}
               role="group"
               aria-roledescription="slide"
-              aria-label={`Review ${i + 1} of ${count}`}
+              aria-label={`Отзыв ${i + 1} из ${count}`}
               className="flex shrink-0 grow-0 basis-full flex-col gap-6 pr-[var(--gutter)] md:basis-1/2 md:flex-row md:items-start md:gap-8"
             >
               <Frame
                 src={t.image}
-                alt={`Black and white portrait of ${t.name}, a client of ${shop.name}`}
+                alt={`Чёрно-белый портрет: ${t.name}, клиент «${shop.name}»`}
                 sizes="(min-width: 768px) 200px, 46vw"
                 parallax={7}
                 delay={i * 0.06}
@@ -217,7 +219,7 @@ export function Testimonials() {
       </Rise>
 
       <p aria-live="polite" className="sr-only">
-        Showing review {index + 1} of {count}
+        Показан отзыв {index + 1} из {count}
       </p>
     </section>
   );

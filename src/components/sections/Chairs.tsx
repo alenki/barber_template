@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { barbers, shop, type Barber } from "@/lib/content";
+import { barbers, locations, shop, type Barber } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
+import { count, years as spellYears } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -23,11 +24,11 @@ const PLACEMENT = [
   "md:col-start-3 md:col-span-5",
 ];
 
-/* "The Chairs" sets 4.12em wide in Bodoni italic at the mega tracking, so these
+/* "Кресла" sets 2.487em wide in Playfair italic at the mega tracking, so these
    are the sizes that run it flush to both gutters on one line. The gutter is
    itself clamped, which is why the ratio changes at md — below 500px it is a
    flat 1.25rem and the line would otherwise overrun a 375px screen. */
-const MEGA = "text-[clamp(3.25rem,21vw,24rem)] md:text-[clamp(10rem,22.2vw,30rem)]";
+const MEGA = "text-[clamp(3.25rem,35vw,40rem)] md:text-[clamp(10rem,36.8vw,44rem)]";
 
 export function Chairs() {
   const years = barbers.reduce((total, b) => total + b.years, 0);
@@ -38,7 +39,7 @@ export function Chairs() {
     <section data-tone="ink" className="slab bg-paper text-ink">
       <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
         <span className="label">
-          Chairs {first} — {last}
+          Кресла {first} — {last}
         </span>
         <span
           className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
@@ -51,13 +52,13 @@ export function Chairs() {
       <SplitText
         as="h2"
         className={`mega ${MEGA} mt-6 md:mt-10`}
-        segments={[{ text: "The Chairs" }]}
+        segments={[{ text: "Кресла" }]}
       />
 
       <Rise className="mt-8 flex justify-end md:mt-12" delay={0.15}>
-        <p className="note max-w-[26ch] text-ash md:text-right">
-          {years} years across {barbers.length} chairs, in three rooms in{" "}
-          {shop.city}.
+        <p className="note max-w-[30ch] text-ash md:text-right">
+          {spellYears(years)} опыта, {count(barbers.length, "кресло", "кресла", "кресел")} и{" "}
+          {count(locations.length, "зал", "зала", "залов")} {shop.cityIn}.
         </p>
       </Rise>
 
@@ -92,17 +93,17 @@ function Chair({ barber, place }: { barber: Barber; place: string }) {
         className="block rounded-[10px]"
       >
         <div className="flex items-baseline justify-between gap-4 border-t border-current/20 pt-3 pb-4">
-          <span className="label">Chair {barber.chair}</span>
-          <span className="label text-ash">{barber.years} yrs</span>
+          <span className="label">Кресло {barber.chair}</span>
+          <span className="label text-ash">{spellYears(barber.years)}</span>
         </div>
 
         <div className="relative overflow-hidden rounded-[10px]">
           <Frame
             src={barber.image}
-            alt={`Portrait of ${barber.name}, ${barber.role.replace(
+            alt={`Портрет: ${barber.name}, ${barber.role.replace(
               " · ",
               ", "
-            )}, in the ${shop.name} shop`}
+            )}, в зале «${shop.name}»`}
             parallax={7}
             sizes="(min-width: 1024px) 42vw, (min-width: 768px) 45vw, 100vw"
             className="aspect-[4/5] w-full"

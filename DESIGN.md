@@ -1,4 +1,4 @@
-# Maison Fade — design system
+# Миллиметр — design system
 
 The whole site is **three colours, three typefaces, and one enormous gesture per screen.**
 Restraint everywhere except scale. If a section has more than one idea in it, it is wrong.
@@ -28,11 +28,11 @@ should draw itself in while that slab is under it. Ember and paper slabs are
 
 | Role | Family | Class | Notes |
 | --- | --- | --- | --- |
-| Display | Bodoni Moda | `.display` | Didone hairlines. `line-height: .86`, tracking `-.038em`. Mix roman and *italic* inside one headline — the italic run is the emphasis. |
-| Mega | Bodoni Moda italic | `.mega` | Single-word section titles at `clamp(3.5rem, 15.5vw, 17rem)`. Spans the entire viewport width, edge to edge. |
-| Label | Courier Prime | `.label` | Uppercase, tracked. Eyebrows, meta, captions. |
-| Note | Courier Prime | `.note` | Uppercase running copy in narrow margin columns. Never wider than ~34ch. |
-| UI | General Sans 700 | `.ui` | Uppercase nav, buttons, small links. |
+| Display | Playfair | `.display` | Didone hairlines. `line-height: .86`, tracking `-.038em`. Mix roman and *italic* inside one headline — the italic run is the emphasis. |
+| Mega | Playfair italic | `.mega` | Single-word section titles at `clamp(3.5rem, 15.5vw, 17rem)`. Spans the entire viewport width, edge to edge. |
+| Label | IBM Plex Mono | `.label` | Uppercase, tracked. Eyebrows, meta, captions. |
+| Note | IBM Plex Mono | `.note` | Uppercase running copy in narrow margin columns. Never wider than ~34ch. |
+| UI | Onest 700 | `.ui` | Uppercase nav, buttons, small links. |
 
 Fluid sizes available as Tailwind font-size utilities: `text-mega`, `text-hero`,
 `text-xl`, `text-lg`, `text-md`.
@@ -44,8 +44,37 @@ Fluid sizes available as Tailwind font-size utilities: `text-mega`, `text-hero`,
 > they drag Tailwind's stock line-height in over `.display`'s `0.86`. Whenever you put one
 > of those on display type, restate the leading: `className="display text-xl leading-[0.86]"`.
 
-Body copy in General Sans is rare and always short. Long-form prose only appears in
+Body copy in Onest is rare and always short. Long-form prose only appears in
 the Journal. Everything else is either enormous display type or small typewriter copy.
+
+> **Trap 3:** the single-word `.mega` titles are hand-fitted to the column —
+> either `--text-mega: calc(100cqw / N)` or a bare `Nvw` — where `N` comes from
+> how wide that *specific word* draws in Playfair italic at `-0.045em`. Change
+> the word and the fit is wrong: "Услуги" is 2.289em, "Записаться" is 4.4925em.
+> Re-measure before you re-word. Set a probe span to `class="mega"` at a known
+> font-size, read `getBoundingClientRect().width`, divide. For the `cqw` fits
+> use `N = em × 1.01`; for the `vw` fits the binding case is a 375px screen with
+> 20px gutters, so `N ≤ 89.3 / em`.
+
+## Language
+
+The site is Russian, and Russian costs the layout things English did not.
+
+- **Grammar lives in `src/lib/words.ts`, never in a component.** `spell(n, gender)`
+  for numerals that agree ("Одна услуга", "Одно кресло"), `plural(n, …)` and
+  `count(n, …)` for the three noun forms a number can take, `money(n)` for
+  roubles. A component that hardcodes "5 кресел" breaks the moment content.ts
+  changes.
+- **Never build a sentence that needs a declined proper noun.** content.ts holds
+  names in the nominative only. "Записаться к Артёму" needs a dative the data
+  does not have, so the barbers page says "Записаться в кресло 01" instead.
+  `shop.cityIn` exists for the same reason — it carries "в Москве" so nothing
+  has to bend "Москва" at runtime.
+- **Every typeface must carry the `cyrillic` subset**, and every fallback in
+  `globals.css` must too. Check new glyphs before you rely on them: ₽ is absent
+  from more Latin-first monos than you would expect.
+- Russian runs roughly 15% longer than English. Measures written in `ch`
+  (`max-w-[34ch]`) absorb that; measures written in `em` or `rem` do not.
 
 ## Layout
 
@@ -82,6 +111,10 @@ everything — pick the one element per section that deserves it.
 
 Everything lives in `src/lib/content.ts`. Never hardcode copy, prices, names or
 hours in a component — import them. Swapping that one file rebrands the site.
+
+The hours table is *parsed*, not just printed: `book/schedule.ts` turns
+"Пн — Пт" and "Суббота" into weekday numbers and "Выходной" into a closed day.
+Invent a new label format and the booking diary stops finding the room's hours.
 
 ## Non-negotiables
 

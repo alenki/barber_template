@@ -12,32 +12,37 @@ import { Frame } from "@/components/motion/Frame";
  * photograph descriptions are derived here.
  */
 const ALT: Record<string, string> = {
-  plateau:
-    "The Saint-Denis room at night: five chrome and black leather barber chairs facing framed mirrors along a white subway-tiled wall",
-  vieux:
-    "Two vintage black leather barber chairs under industrial pendant lamps in a high-ceilinged grey room in Vieux-Montréal",
-  "mile-end":
-    "A chrome and dark leather reclining barber chair standing alone in front of a tall arched brass mirror",
+  patriki:
+    "Зал на Патриарших вечером: пять хромированных кресел с чёрной кожей напротив зеркал в рамах вдоль стены в белой плитке",
+  oktyabr:
+    "Два винтажных кресла из чёрной кожи под промышленными подвесными лампами в сером зале с высоким потолком",
+  danilovsky:
+    "Хромированное кресло с тёмной кожей стоит в одиночестве перед высоким арочным зеркалом в латунной раме",
 };
 
-/** Deep-links straight into Google Maps rather than to a pinned coordinate. */
+/** Deep-links straight into Yandex Maps rather than to a pinned coordinate. */
 function mapsUrl(address: string, city: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  return `https://yandex.ru/maps/?text=${encodeURIComponent(
     address + ", " + city
   )}`;
 }
 
-const WALK_IN = "Walk-ins welcome, chair permitting —";
+const WALK_IN = "Без записи — если есть свободное кресло —";
 
 export function Locations() {
   return (
     <section data-tone="ink" className="slab bg-ember text-ink">
       {/* The word, with the count riding its top-right corner. */}
       <div className="relative block w-fit max-w-full">
+        {/* "Адреса" is six letters where "Locations" was nine, so the stock
+            `--text-mega` clamp would leave it sitting at about 40% of the
+            slab. 24vw restores the proportion the section was drawn at —
+            roughly two thirds of the column — without ever reaching the
+            gutter, which is what keeps room for the count badge. */}
         <SplitText
           as="h2"
-          className="mega -ml-[0.015em]"
-          segments={[{ text: "Locations" }]}
+          className="mega -ml-[0.015em] text-[clamp(3.5rem,24vw,26rem)]"
+          segments={[{ text: "Адреса" }]}
           stagger={0.06}
         />
 
@@ -71,7 +76,7 @@ export function Locations() {
               >
                 <Frame
                   src={loc.image}
-                  alt={ALT[loc.id] ?? `Inside the ${loc.name} room at ${shop.name}`}
+                  alt={ALT[loc.id] ?? `Зал «${loc.name}» в «${shop.name}»`}
                   className="aspect-[3/4] w-full"
                   sizes="(min-width: 768px) 31vw, 100vw"
                   parallax={7}
@@ -109,7 +114,7 @@ export function Locations() {
                 </dl>
 
                 <span className="sr-only">
-                  Open {loc.name} in Google Maps, in a new tab
+                  Открыть «{loc.name}» в Яндекс Картах, в новой вкладке
                 </span>
               </a>
             </Rise>

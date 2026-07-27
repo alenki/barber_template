@@ -13,19 +13,23 @@ import {
 import { marqueeWords, services, shop } from "@/lib/content";
 import { Rise, SplitText } from "@/components/motion/SplitText";
 import { Marquee } from "@/components/motion/Marquee";
+import { money } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+/** The word that spans the slab, and how wide it draws. See TITLE_FILL. */
+const TITLE = "Услуги";
+
 /**
- * "Services" set in Bodoni Moda italic at the .mega tracking (-0.045em) measures
- * 3.183x its own font-size. Dividing the container's own inline size by that
+ * "Услуги" set in Playfair italic at the .mega tracking (-0.045em) measures
+ * 2.289x its own font-size. Dividing the container's own inline size by that
  * lands the word flush against both gutters at every width — but only if the
  * container IS the gutter-to-gutter column, hence `containerType` on the .edge
  * div rather than on a full-bleed parent. cqw, not vw, keeps a desktop
- * scrollbar out of the sum. 3.2 rather than 3.183 leaves a hair of slack so
- * the italic overhang on the final "s" is never clipped.
+ * scrollbar out of the sum. 2.32 rather than 2.289 leaves a hair of slack so
+ * the italic overhang on the final "и" is never clipped.
  */
-const TITLE_FILL = "calc(100cqw / 3.2)";
+const TITLE_FILL = "calc(100cqw / 2.32)";
 
 const PREVIEW_W = 320;
 const PREVIEW_H = 420;
@@ -35,7 +39,7 @@ const MIN_PRICE = Math.min(...services.map((s) => s.price));
 const MIN_MINUTES = Math.min(...services.map((s) => s.minutes));
 const MAX_MINUTES = Math.max(...services.map((s) => s.minutes));
 
-const altFor = (name: string) => `${name} in progress at ${shop.name}`;
+const altFor = (name: string) => `«${name}» в работе в «${shop.name}»`;
 
 /**
  * The cursor preview is a mouse-only idea. Touch devices get thumbnails
@@ -89,7 +93,7 @@ export function Services() {
       {/* ── eyebrow ─────────────────────────────────────────────── */}
       <Rise className="edge">
         <p className="label max-w-[34ch] md:ml-[62%]">
-          From ${MIN_PRICE} · {MIN_MINUTES} to {MAX_MINUTES} minutes
+          От {money(MIN_PRICE)} · от {MIN_MINUTES} до {MAX_MINUTES} минут
         </p>
       </Rise>
 
@@ -104,7 +108,7 @@ export function Services() {
               as="h2"
               duration={1.15}
               className="mega -ml-[0.015em] block"
-              segments={[{ text: "Services" }]}
+              segments={[{ text: TITLE }]}
             />
           </div>
         </div>
@@ -185,7 +189,7 @@ export function Services() {
                   </span>
 
                   <span className="label col-start-3 row-start-1 text-right lg:col-start-3 lg:row-start-1 lg:text-left">
-                    {service.minutes} min
+                    {service.minutes} мин
                   </span>
 
                   <span
@@ -194,8 +198,8 @@ export function Services() {
                     {service.name}
                   </span>
 
-                  <span className="display col-start-3 row-start-2 text-right text-lg lg:col-start-4 lg:row-start-1">
-                    ${service.price}
+                  <span className="display col-start-3 row-start-2 text-right text-lg whitespace-nowrap lg:col-start-4 lg:row-start-1">
+                    {money(service.price)}
                   </span>
                 </Link>
               </li>
@@ -221,7 +225,7 @@ export function Services() {
           href="/services"
           className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember"
         >
-          All services and prices
+          Все услуги и цены
           <span
             aria-hidden="true"
             className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"

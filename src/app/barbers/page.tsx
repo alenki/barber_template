@@ -4,11 +4,16 @@ import Link from "next/link";
 import { barbers, shop, type Barber } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-import { spellNone } from "@/lib/words";
+import { count, plural, spellNone, years as spellYears } from "@/lib/words";
 
 export const metadata: Metadata = {
-  title: "The Chairs",
-  description: `The ${barbers.length} barbers at ${shop.name} in ${shop.city} — who sits in which chair, what they are best at, and how to book them by name.`,
+  title: "Кресла",
+  description: `${count(
+    barbers.length,
+    "мастер",
+    "мастера",
+    "мастеров"
+  )} «${shop.name}» ${shop.cityIn} — кто в каком кресле, кто в чём силён и как записаться к конкретному.`,
 };
 
 /* Everything below is derived from content.ts. Nothing is counted by hand and
@@ -24,11 +29,11 @@ const NEXT_CHAIR = String(barbers.length + 1).padStart(FIRST_CHAIR.length, "0");
 
 /* The one line on the page that is not a name, a number or a bio. */
 const APPROACH =
-  "A chair here is not a slot in a rota — it is one person who remembers the shape of your head.";
+  "Кресло здесь — это не строчка в графике, а человек, который помнит форму вашей головы.";
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0];
 const surname = (name: string) => name.trim().split(/\s+/).slice(1).join(" ");
-const roleReadable = (role: string) => role.replace(" · ", " and ");
+const roleReadable = (role: string) => role.replace(" · ", ", ");
 
 export default function BarbersPage() {
   return (
@@ -37,17 +42,20 @@ export default function BarbersPage() {
       <section data-tone="ink" className="relative bg-ember text-ink">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
           <Rise>
-            <p className="label">{spellNone(barbers.length)} chairs</p>
+            <p className="label">
+              {spellNone(barbers.length, "n")}{" "}
+              {plural(barbers.length, "кресло", "кресла", "кресел")}
+            </p>
           </Rise>
 
           {/* `text-hero` is a registered utility — never text-[var(--…)]. */}
           <SplitText
             as="h1"
             delay={0.12}
-            className="display mt-[clamp(1.5rem,3vw,2.5rem)] max-w-[13ch] text-hero"
+            className="display mt-[clamp(1.5rem,3vw,2.5rem)] max-w-[14ch] text-hero"
             segments={[
-              { text: "Nobody here is" },
-              { text: "interchangeable", italic: true },
+              { text: "Здесь никто не" },
+              { text: "взаимозаменяем", italic: true },
             ]}
           />
 
@@ -56,9 +64,9 @@ export default function BarbersPage() {
             className="mt-[clamp(4rem,12vw,9rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
           >
             <span className="label">
-              Chairs {FIRST_CHAIR} — {LAST_CHAIR}
+              Кресла {FIRST_CHAIR} — {LAST_CHAIR}
             </span>
-            <span className="label">{TOTAL_YEARS} years between them</span>
+            <span className="label">{spellYears(TOTAL_YEARS)} на всех</span>
             <span className="label">{shop.city}</span>
           </Rise>
         </div>
@@ -76,17 +84,18 @@ export default function BarbersPage() {
       <section data-tone="ink" className="bg-ember text-ink">
         <div className="edge py-[clamp(5rem,11vw,12rem)]">
           <Rise className="ml-auto max-w-[34ch] border-t border-current/20 pt-5">
-            <p className="label">Chair {NEXT_CHAIR} — unclaimed</p>
+            <p className="label">Кресло {NEXT_CHAIR} — свободно</p>
             <p className="note mt-4">
-              We hire once a year, slowly, and only ever by conversation. If you
-              cut hair like the last two millimetres matter, write to{" "}
+              Мы берём людей раз в год, медленно и только через разговор. Если
+              вы стрижёте так, будто последние два миллиметра имеют значение,
+              напишите на{" "}
               <a
                 href={`mailto:${shop.email}`}
                 className="underline underline-offset-4 transition-colors duration-300 hover:text-paper"
               >
                 {shop.email}
               </a>{" "}
-              and tell us where you learned.
+              и расскажите, где учились.
             </p>
           </Rise>
         </div>
@@ -139,9 +148,9 @@ function Chair({
             >
               <Frame
                 src={barber.image}
-                alt={`Portrait of ${barber.name}, ${roleReadable(
+                alt={`Портрет: ${barber.name}, ${roleReadable(
                   barber.role
-                )}, at chair ${barber.chair} in the ${shop.name} shop`}
+                )}, у кресла ${barber.chair} в зале «${shop.name}»`}
                 parallax={8}
                 /* Chair 01 is the page's largest paint on a phone. */
                 priority={index === 0}
@@ -175,7 +184,7 @@ function Chair({
               }`}
             >
               <Rise className="flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
-                <span className="label">Chair {barber.chair}</span>
+                <span className="label">Кресло {barber.chair}</span>
                 <span className="label text-right text-ash">{barber.role}</span>
               </Rise>
 
@@ -194,7 +203,7 @@ function Chair({
 
               <Rise delay={0.16} className="mt-4">
                 <p className="label text-ash">
-                  {barber.years} years behind the chair
+                  {spellYears(barber.years)} за креслом
                 </p>
               </Rise>
 
@@ -222,7 +231,12 @@ function Chair({
                   href={`/book?barber=${barber.id}`}
                   className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember"
                 >
-                  Book with {first}
+                  {/* "Записаться к Артёму" would need the dative of a name
+                      content.ts only carries in the nominative, and Russian
+                      first names do not all bend the same way. The chair
+                      number sidesteps the case entirely and is the metaphor
+                      the whole page is built on. */}
+                  Записаться в кресло {barber.chair}
                   <span
                     aria-hidden="true"
                     className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"

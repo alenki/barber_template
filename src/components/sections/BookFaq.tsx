@@ -4,20 +4,20 @@ import { useId, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { faqs, locations, shop } from "@/lib/content";
+import { faqs, locations, shop, BOOK_LABEL } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
- * "Book now" is set to the exact width of the gutter-to-gutter column.
- * The headline measures 3.7375em wide in Bodoni Moda italic at the `.mega`
- * tracking, so dividing the container's inline size by 3.8 fills the line
+ * "Записаться" is set to the exact width of the gutter-to-gutter column.
+ * The headline measures 4.4925em wide in Playfair italic at the `.mega`
+ * tracking, so dividing the container's inline size by 4.55 fills the line
  * edge to edge with roughly one percent of slack for the italic overhang.
  * Overriding `--text-mega` keeps the `.mega` utility intact; `cqw` is used
  * rather than `vw` so a desktop scrollbar can never push the line wide.
  */
-const MEGA_FIT = { "--text-mega": "calc(100cqw / 3.8)" } as CSSProperties;
+const MEGA_FIT = { "--text-mega": "calc(100cqw / 4.55)" } as CSSProperties;
 const MEGA_CONTAINER = { containerType: "inline-size" } as CSSProperties;
 
 export function BookFaq() {
@@ -32,7 +32,7 @@ export function BookFaq() {
       {/* ---------------------------------------------------------- book */}
 
       <Rise className="edge flex items-baseline justify-between gap-6">
-        <span className="label text-paper/55">Booking</span>
+        <span className="label text-paper/55">Запись</span>
         {/* -my-3 py-3 keeps the optical position while giving the tap target
             the height it needs on a phone. */}
         <a
@@ -50,7 +50,7 @@ export function BookFaq() {
             stagger={0.09}
             duration={1.15}
             className="mega whitespace-nowrap text-paper"
-            segments={[{ text: "Book now", italic: true }]}
+            segments={[{ text: BOOK_LABEL, italic: true }]}
           />
         </div>
         <motion.div
@@ -68,8 +68,8 @@ export function BookFaq() {
             href="/book"
             className="ease-[cubic-bezier(0.16,1,0.3,1)] flex aspect-square w-[clamp(11rem,16vw,13rem)] items-center justify-center rounded-full bg-ember text-ink transition-transform duration-700 hover:scale-[1.06] focus-visible:scale-[1.06]"
           >
-            <span className="display max-w-[7ch] text-center text-[clamp(1.35rem,2.3vw,1.85rem)] italic">
-              Book a chair
+            <span className="display max-w-[9ch] text-center text-[clamp(1.35rem,2.3vw,1.85rem)] italic">
+              Занять кресло
             </span>
           </Link>
         </Rise>
@@ -79,12 +79,12 @@ export function BookFaq() {
           className="md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9"
         >
           <p className="note max-w-[40ch] text-paper/70">
-            Booking online takes under a minute. Choose the room, the service and
-            the barber, or leave the chair to us.
+            Запись онлайн занимает меньше минуты. Выберите зал, услугу и мастера
+            — или оставьте кресло на наше усмотрение.
           </p>
           <p className="note mt-5 max-w-[40ch] text-paper/70">
-            Pay now or settle at the end, whichever you prefer. Cancellation is
-            free up to six hours before.
+            Оплата сразу или в конце, как вам удобнее. Отмена бесплатна не позже
+            чем за шесть часов.
           </p>
         </Rise>
       </div>
@@ -114,9 +114,9 @@ export function BookFaq() {
 
       <div className="edge mt-[clamp(6rem,14vw,14rem)] md:grid md:grid-cols-12 md:gap-x-8">
         <Rise className="md:col-span-3 md:self-start md:sticky md:top-28">
-          <p className="label text-paper/55">Questions</p>
-          <p className="note mt-6 max-w-[24ch] text-paper/45">
-            Anything else, write to us.
+          <p className="label text-paper/55">Вопросы</p>
+          <p className="note mt-6 max-w-[26ch] text-paper/45">
+            Если остались вопросы — напишите.
           </p>
           <a
             href={`mailto:${shop.email}`}

@@ -1,10 +1,11 @@
 "use client";
 
 import { money } from "./schedule";
+import { count } from "@/lib/words";
 
 export type SummaryRow = {
   key: string;
-  /** Typewriter caption — "Room", "Service", "Chair". */
+  /** Typewriter caption — "Зал", "Услуга", "Кресло". */
   label: string;
   /** The choice itself, or null while it is still unmade. */
   value: string | null;
@@ -32,11 +33,11 @@ export function SummaryRail({
 }) {
   return (
     <aside
-      aria-label="Your booking so far"
+      aria-label="Ваша запись"
       className="hidden md:col-span-4 md:col-start-9 md:block"
     >
       <div className="sticky top-[clamp(6rem,11vh,8rem)] border-t border-current/20 pt-4">
-        <p className="label">So far</p>
+        <p className="label">Пока что</p>
 
         <ul className="m-0 mt-7 list-none p-0">
           {rows.map((row) => {
@@ -50,7 +51,7 @@ export function SummaryRail({
                   <button
                     type="button"
                     onClick={() => onJump(row.step)}
-                    aria-label={`Change ${row.label.toLowerCase()} — currently ${value}`}
+                    aria-label={`Изменить: ${row.label.toLowerCase()} — сейчас ${value}`}
                     className="flex w-full items-baseline justify-between gap-4 py-3 text-left transition-opacity duration-500 hover:opacity-55"
                   >
                     <RowText label={row.label} value={value} />
@@ -69,7 +70,7 @@ export function SummaryRail({
                         <span className="label opacity-40" aria-hidden="true">
                           —
                         </span>
-                        <span className="sr-only">Not chosen yet</span>
+                        <span className="sr-only">Ещё не выбрано</span>
                       </>
                     )}
                   </div>
@@ -80,13 +81,15 @@ export function SummaryRail({
         </ul>
 
         <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
-          <span className="label">Total</span>
-          <span className="display text-[clamp(1.35rem,2.2vw,2rem)] leading-none italic">
+          <span className="label">Итого</span>
+          <span className="display text-[clamp(1.35rem,2.2vw,2rem)] leading-none whitespace-nowrap italic">
             {total === null ? "—" : money(total)}
           </span>
         </div>
         <p className="label mt-2 text-right opacity-50">
-          {minutes === null ? "Nothing chosen" : `${minutes} minutes in the chair`}
+          {minutes === null
+            ? "Ничего не выбрано"
+            : `${count(minutes, "минута", "минуты", "минут")} в кресле`}
         </p>
       </div>
     </aside>
@@ -118,13 +121,13 @@ export function SummaryBar({
      generic role, so on a phone this running summary had no name at all. */
   return (
     <section
-      aria-label="Your booking so far"
+      aria-label="Ваша запись"
       className="mt-6 border-t border-current/20 pt-3 md:hidden"
     >
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="label opacity-50">So far</span>
+        <span className="label opacity-50">Пока что</span>
         {filled.length === 0 ? (
-          <span className="label opacity-40">Nothing yet</span>
+          <span className="label opacity-40">Пока пусто</span>
         ) : (
           filled.map((row) => (
             <span key={row.key} className="label">
@@ -133,7 +136,7 @@ export function SummaryBar({
           ))
         )}
         {total === null ? null : (
-          <span className="label ml-auto">{money(total)}</span>
+          <span className="label ml-auto whitespace-nowrap">{money(total)}</span>
         )}
       </div>
     </section>

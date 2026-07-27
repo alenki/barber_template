@@ -57,7 +57,7 @@ export function Manifesto() {
       <div className="edge pb-[clamp(5rem,11vw,12rem)]">
         <Frame
           src="/img/manifesto.jpg"
-          alt={`A barber at ${shop.name} drawing a straight razor down a lathered jaw, a white towel folded over his shoulder`}
+          alt={`Мастер «${shop.name}» ведёт опасную бритву по намыленной челюсти, белое полотенце сложено у него на плече`}
           sizes="100vw"
           parallax={10}
           className="h-[62svh] w-full md:h-[70svh]"
