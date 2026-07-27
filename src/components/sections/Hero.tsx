@@ -5,8 +5,6 @@ import { hero, shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
 export function Hero() {
   return (
     <section

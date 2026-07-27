@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Maison Fade
 
-## Getting Started
+A barbershop website. Fictional shop, real build — meant to be shown to barbershops as
+an example, or rebranded into an actual client site in an afternoon.
 
-First, run the development server:
+Montréal, three rooms, five chairs, six services. None of it exists.
+
+---
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Node 20.19+ / 22.13+ recommended.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| | |
+| --- | --- |
+| Framework | Next.js 16, App Router, TypeScript |
+| Styling | Tailwind CSS v4 (`@theme` tokens in `src/app/globals.css`) |
+| Motion | [Motion](https://motion.dev) (`motion/react`) |
+| Fonts | Bodoni Moda + Courier Prime via `next/font/google`, General Sans self-hosted in `public/fonts` |
+| Images | Pexels, downloaded to `public/img` — free for commercial use, no attribution required |
 
-## Learn More
+## Rebranding it
 
-To learn more about Next.js, take a look at the following resources:
+Almost everything a shop would want to change lives in **one file**: `src/lib/content.ts`.
+Shop name, city, contact details, services and prices, barbers, locations and hours,
+testimonials, FAQs and journal posts all come from there. No copy is hardcoded in a
+component.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To change the look, `src/app/globals.css` holds the entire design system as tokens —
+three colours and three typefaces. Swapping `--color-ember` recolours the whole site.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`DESIGN.md` documents the rules the site is built to. Read it before adding anything.
 
-## Deploy on Vercel
+## Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/
+    page.tsx              home — the long scroll
+    services/             full price list and policies
+    barbers/              the five chairs
+    book/                 five-step booking flow
+    journal/              index + [slug] post template
+  components/
+    chrome/               header, footer, sticky book pill, wordmark
+    motion/               SplitText, Frame, Marquee — the shared primitives
+    sections/             the home page slabs
+    book/                 the booking flow
+  lib/
+    content.ts            every word and price on the site
+    fonts.ts              the type stack
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- The booking flow is a front-end demonstration. It validates input and produces a
+  deterministic reference code, but nothing is submitted anywhere and no appointment
+  is made. Wiring it to a real system means replacing one submit handler.
+- Photography is placeholder. A real shop should shoot its own room and its own barbers —
+  it is the single biggest upgrade available to any barbershop site.
+- The logo mark is a fade drawn literally: bars stepping from solid to hairline.

@@ -1,0 +1,525 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { barbers, locations, services, shop } from "@/lib/content";
+import { SplitText, Rise } from "@/components/motion/SplitText";
+import { OptionRow, ROW_BLEED } from "./OptionRow";
+import { SummaryBar, SummaryRail, type SummaryRow } from "./Summary";
+import { TimeStep } from "./TimeStep";
+import { DetailsForm, type Details } from "./DetailsForm";
+import { Confirmation, type Booking } from "./Confirmation";
+import {
+  ANY_CHAIR,
+  buildDays,
+  clock,
+  dayLabel,
+  DAY_COUNT,
+  isoOf,
+  referenceCode,
+  spell,
+  type Day,
+} from "./schedule";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
+
+const STEP_COUNT = 5;
+const DONE = STEP_COUNT + 1;
+
+/* Today's date, read once on the client. `getSnapshot` has to return the same
+   reference every call or React re-renders forever, hence the module-level cache. */
+let cachedToday: string | null = null;
+const todaySnapshot = () => (cachedToday ??= isoOf(new Date()));
+const subscribeNever = () => () => {};
+
+/* ------------------------------------------------------------------
+   The words on this screen that are not a name, a price or an hour.
+   content.ts owns the shop; this file owns the questions it asks.
+   ------------------------------------------------------------------ */
+
+const STEPS = [
+  {
+    eyebrow: "The room",
+    roman: `${spell(locations.length)} rooms.`,
+    italic: "Pick one.",
+    note: "Same prices and the same chairs in all three. The hours differ a little, and Sunday differs the most.",
+  },
+  {
+    eyebrow: "The service",
+    roman: "What are you",
+    italic: "having?",
+    note: `One service, one sitting. For two in the same chair — a cut and a shave together — call ${shop.phone} and we will set it up by hand.`,
+  },
+  {
+    eyebrow: "The chair",
+    roman: "Whose",
+    italic: "hands?",
+    note: "Ask for a name or leave it to us. Nobody here is interchangeable, and nobody here is a compromise.",
+  },
+  {
+    eyebrow: "The hour",
+    roman: "When can you",
+    italic: "sit down?",
+    note: `${spell(DAY_COUNT)} days ahead. The hours already spoken for are greyed out and cannot be picked.`,
+  },
+  {
+    eyebrow: "You",
+    roman: "Who are we",
+    italic: "holding it for?",
+    note: "Nothing is charged now. You settle at the end, card or cash, and you can move the hour free up to six hours before.",
+  },
+] as const;
+
+const SUBMIT_LABEL = "Hold the chair";
+
+/* "Barber · Shave Specialist" reads badly mid-sentence in alt text. */
+const readableRole = (role: string) => role.replace(" · ", " and ");
+
+/* ------------------------------------------------------------------ */
+
+type Chosen = {
+  location: string | null;
+  service: string | null;
+  barber: string | null;
+  date: string | null;
+  /** Minutes from midnight, so the end of the appointment is arithmetic. */
+  time: number | null;
+};
+
+const EMPTY: Chosen = {
+  location: null,
+  service: null,
+  barber: null,
+  date: null,
+  time: null,
+};
+
+export function BookingFlow() {
+  const params = useSearchParams();
+
+  /* /barbers links in with ?barber=amir — honour it, but still ask for the
+     room and the service first. */
+  const preset = params.get("barber");
+  const presetBarber =
+    preset && (preset === ANY_CHAIR.id || barbers.some((b) => b.id === preset))
+      ? preset
+      : null;
+
+  const [step, setStep] = useState(1);
+  const [chosen, setChosen] = useState<Chosen>(() => ({
+    ...EMPTY,
+    barber: presetBarber,
+  }));
+  const [booking, setBooking] = useState<Booking | null>(null);
+
+  /* The only real date on the page. Read through useSyncExternalStore so the
+     server renders `null` and the client renders today's date — no hydration
+     mismatch, and no setState cascading out of an effect. `todaySnapshot` is
+     memoised at module scope because getSnapshot must be referentially stable. */
+  const startISO = useSyncExternalStore(subscribeNever, todaySnapshot, () => null);
+  const days: Day[] = useMemo(
+    () => (startISO ? buildDays(startISO) : []),
+    [startISO]
+  );
+
+  const room = locations.find((l) => l.id === chosen.location) ?? null;
+  const service = services.find((s) => s.id === chosen.service) ?? null;
+  const barber = barbers.find((b) => b.id === chosen.barber) ?? null;
+  const chairName =
+    chosen.barber === ANY_CHAIR.id ? ANY_CHAIR.name : barber?.name ?? null;
+  const day = days.find((d) => d.iso === chosen.date) ?? null;
+
+  /* ------------------------------------------------------- transitions */
+
+  /**
+   * `mode="wait"` means the incoming step is not in the document until the
+   * outgoing one has finished leaving, so focus is moved by a callback ref
+   * when the new panel actually mounts rather than on the state change.
+   */
+  const mounted = useRef(false);
+  const wantsFocus = useRef(false);
+
+  const stepPanel = useCallback((node: HTMLDivElement | null) => {
+    if (node && wantsFocus.current) {
+      wantsFocus.current = false;
+      node.focus({ preventScroll: true });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    wantsFocus.current = true;
+    window.scrollTo(0, 0);
+  }, [step]);
+
+  const pickLocation = (id: string) => {
+    /* Hours differ room to room, so a held time cannot survive the move. */
+    setChosen((c) => ({ ...c, location: id, date: null, time: null }));
+    setStep(2);
+  };
+
+  const pickService = (id: string) => {
+    /* The slot grid is cut from the service length — drop the hour, keep the day. */
+    setChosen((c) => ({ ...c, service: id, time: null }));
+    setStep(3);
+  };
+
+  const pickBarber = (id: string) => {
+    setChosen((c) => ({ ...c, barber: id }));
+    setStep(4);
+  };
+
+  const pickDay = useCallback((iso: string) => {
+    setChosen((c) => (c.date === iso ? c : { ...c, date: iso, time: null }));
+  }, []);
+
+  const pickTime = (minutes: number) => {
+    setChosen((c) => ({ ...c, time: minutes }));
+    setStep(5);
+  };
+
+  const submit = (details: Details) => {
+    if (!room || !service || !day || chosen.time === null) return;
+    setBooking({
+      room: room.name,
+      roomAddress: `${room.address}, ${room.city}`,
+      roomImage: room.image,
+      service: service.name,
+      chair: chairName ?? ANY_CHAIR.name,
+      dateLabel: dayLabel(day),
+      start: chosen.time,
+      price: service.price,
+      minutes: service.minutes,
+      reference: referenceCode([
+        room.id,
+        service.id,
+        chosen.barber,
+        day.iso,
+        chosen.time,
+        details.name,
+      ]),
+      details,
+    });
+    setStep(DONE);
+  };
+
+  const restart = () => {
+    setBooking(null);
+    setChosen({ ...EMPTY, barber: presetBarber });
+    setStep(1);
+  };
+
+  /* Jumping back from the rail must never leave a stale hour behind. */
+  const jump = (target: number) => {
+    if (target >= step || step === DONE) return;
+    setStep(target);
+  };
+
+  /* ------------------------------------------------------------ summary */
+
+  const rows: SummaryRow[] = [
+    { key: "room", label: "Room", value: room?.name ?? null, step: 1 },
+    { key: "service", label: "Service", value: service?.name ?? null, step: 2 },
+    { key: "chair", label: "Chair", value: chairName, step: 3 },
+    { key: "day", label: "Day", value: day ? dayLabel(day) : null, step: 4 },
+    {
+      key: "time",
+      label: "Hour",
+      value: chosen.time === null ? null : clock(chosen.time),
+      step: 4,
+    },
+  ];
+
+  const total = service ? service.price : null;
+  const minutes = service ? service.minutes : null;
+
+  const done = step === DONE;
+  const current = STEPS[Math.min(step, STEP_COUNT) - 1];
+
+  return (
+    <section
+      data-tone="ink"
+      className="relative min-h-svh bg-ember text-ink"
+    >
+      <div className="edge pt-[clamp(6.5rem,17svh,11rem)] pb-[clamp(4.5rem,10vw,9rem)]">
+        {/* ----------------------------------------------- progress head */}
+        <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
+          <p className="label" role="status" aria-live="polite">
+            {done
+              ? "Booked"
+              : `Step ${String(step).padStart(2, "0")} / ${String(
+                  STEP_COUNT
+                ).padStart(2, "0")} — ${current.eyebrow}`}
+          </p>
+
+          {done ? (
+            <span className="label opacity-55">{shop.city}</span>
+          ) : step > 1 ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => s - 1)}
+              className="ui group inline-flex items-center gap-2 border-b border-current/30 pb-1 transition-opacity duration-500 hover:opacity-60"
+            >
+              <span
+                aria-hidden="true"
+                className={`inline-block transition-transform duration-500 ${EASE_CLASS} group-hover:-translate-x-1`}
+              >
+                ←
+              </span>
+              Back
+            </button>
+          ) : (
+            <span className="label opacity-55">{shop.city}</span>
+          )}
+        </div>
+
+        <div className="mt-4 flex gap-[4px]" aria-hidden="true">
+          {Array.from({ length: STEP_COUNT }, (_, i) => (
+            <span
+              key={i}
+              className={`h-[2px] flex-1 transition-colors duration-700 ${EASE_CLASS} ${
+                done || i < step ? "bg-ink" : "bg-ink/20"
+              }`}
+            />
+          ))}
+        </div>
+
+        {!done && <SummaryBar rows={rows} total={total} />}
+
+        {/* ----------------------------------------------------- the step */}
+        <div className="mt-[clamp(2.5rem,6vw,5rem)] grid grid-cols-1 gap-y-[clamp(3rem,6vw,5rem)] md:grid-cols-12 md:gap-x-[clamp(1.5rem,3vw,3.5rem)]">
+          <div className={done ? "md:col-span-12" : "md:col-span-7"}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -18 }}
+                transition={{ duration: 0.45, ease: EASE }}
+                ref={stepPanel}
+                tabIndex={-1}
+                className="outline-none"
+              >
+                {done && booking ? (
+                  <Confirmation booking={booking} onRestart={restart} />
+                ) : (
+                  <>
+                    <SplitText
+                      as="h2"
+                      animateOnMount
+                      stagger={0.04}
+                      duration={0.85}
+                      className="display text-[clamp(2.6rem,6.6vw,6.75rem)]"
+                      segments={[
+                        { text: current.roman },
+                        { text: current.italic, italic: true },
+                      ]}
+                    />
+
+                    <Rise
+                      animateOnMount
+                      delay={0.16}
+                      y={16}
+                      duration={0.7}
+                      className="mt-[clamp(1.5rem,3vw,2.5rem)]"
+                    >
+                      <p className="note max-w-[34ch] opacity-75 md:ml-auto md:text-right">
+                        {current.note}
+                      </p>
+                    </Rise>
+
+                    <Rise
+                      animateOnMount
+                      delay={0.24}
+                      y={20}
+                      duration={0.7}
+                      className="mt-[clamp(2.5rem,5vw,4.5rem)]"
+                    >
+                      <StepBody
+                        step={step}
+                        chosen={chosen}
+                        days={days}
+                        presetBarber={presetBarber}
+                        onLocation={pickLocation}
+                        onService={pickService}
+                        onBarber={pickBarber}
+                        onDay={pickDay}
+                        onTime={pickTime}
+                        onSubmit={submit}
+                      />
+                    </Rise>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {!done && (
+            <SummaryRail
+              rows={rows}
+              total={total}
+              minutes={minutes}
+              currentStep={step}
+              onJump={jump}
+            />
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+function StepBody({
+  step,
+  chosen,
+  days,
+  presetBarber,
+  onLocation,
+  onService,
+  onBarber,
+  onDay,
+  onTime,
+  onSubmit,
+}: {
+  step: number;
+  chosen: Chosen;
+  days: Day[];
+  presetBarber: string | null;
+  onLocation: (id: string) => void;
+  onService: (id: string) => void;
+  onBarber: (id: string) => void;
+  onDay: (iso: string) => void;
+  onTime: (minutes: number) => void;
+  onSubmit: (details: Details) => void;
+}) {
+  const room = locations.find((l) => l.id === chosen.location) ?? null;
+  const service = services.find((s) => s.id === chosen.service) ?? null;
+
+  if (step === 1) {
+    const held = barbers.find((b) => b.id === presetBarber);
+    return (
+      <>
+        <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+          {locations.map((location, i) => (
+            <OptionRow
+              key={location.id}
+              index={String(i + 1).padStart(2, "0")}
+              title={location.name}
+              detail={location.address}
+              aside={location.city}
+              valueNote={`${location.chairs} chairs`}
+              selected={chosen.location === location.id}
+              onSelect={() => onLocation(location.id)}
+            />
+          ))}
+        </ul>
+        {held ? (
+          <p className="label mt-6 opacity-60">
+            Chair {held.chair} — {held.name} is already held for you.
+          </p>
+        ) : null}
+      </>
+    );
+  }
+
+  if (step === 2) {
+    return (
+      <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+        {services.map((s) => (
+          <OptionRow
+            key={s.id}
+            index={s.index}
+            title={s.name}
+            detail={`${s.minutes} minutes`}
+            aside={s.blurb}
+            value={`$${s.price}`}
+            selected={chosen.service === s.id}
+            onSelect={() => onService(s.id)}
+          />
+        ))}
+      </ul>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+        {barbers.map((b) => (
+          <OptionRow
+            key={b.id}
+            index={b.chair}
+            media={
+              /* A span, not a div: this sits inside the row's button, and a
+                 button may only hold phrasing content. */
+              <span className="relative block size-[clamp(3.25rem,5.5vw,4.75rem)] overflow-hidden rounded-[10px] bg-ink/10">
+                <Image
+                  src={b.image}
+                  alt={`Portrait of ${b.name}, ${readableRole(b.role)} at ${
+                    shop.name
+                  }`}
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                  style={{ objectPosition: "center 25%" }}
+                />
+              </span>
+            }
+            title={b.name}
+            detail={b.role}
+            aside={b.specialties.join(" · ")}
+            valueNote={`${b.years} yrs`}
+            selected={chosen.barber === b.id}
+            onSelect={() => onBarber(b.id)}
+          />
+        ))}
+
+        <OptionRow
+          key={ANY_CHAIR.id}
+          index="—"
+          media={
+            <span className="grid size-[clamp(3.25rem,5.5vw,4.75rem)] place-items-center rounded-[10px] border border-current/25">
+              <span className="label leading-none opacity-70">Any</span>
+            </span>
+          }
+          title={ANY_CHAIR.name}
+          detail={ANY_CHAIR.role}
+          aside={ANY_CHAIR.detail}
+          selected={chosen.barber === ANY_CHAIR.id}
+          onSelect={() => onBarber(ANY_CHAIR.id)}
+        />
+      </ul>
+    );
+  }
+
+  if (step === 4) {
+    if (!room || !service) return null;
+    return (
+      <TimeStep
+        room={room}
+        service={service}
+        days={days}
+        date={chosen.date}
+        time={chosen.time}
+        onPickDay={onDay}
+        onPickTime={onTime}
+      />
+    );
+  }
+
+  return <DetailsForm onSubmit={onSubmit} submitLabel={SUBMIT_LABEL} />;
+}
