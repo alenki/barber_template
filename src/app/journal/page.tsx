@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { posts, shop, type Post } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
@@ -7,8 +8,8 @@ import { count, plural, spellNone } from "@/lib/words";
 
 /* ------------------------------------------------------------------
    content.ts owns the words and the image paths. What it does not carry
-   — the description of each photograph, the counting, and the two lines
-   of house voice that belong to this page and nowhere else — is derived
+   (the description of each photograph, the counting, and the two lines
+   of house voice that belong to this page and nowhere else) is derived
    here. All of it is pure: no dates read at render, no randomness, so
    the server and the client always agree on the same markup.
    ------------------------------------------------------------------ */
@@ -25,12 +26,12 @@ const index = (i: number) => String(i + 1).padStart(2, "0");
 
 export const metadata: Metadata = {
   title: "Журнал",
-  description: `Заметки из кресла «${shop.name}» ${shop.cityIn} — ${count(
+  description: `Заметки из кресла «${shop.name}» ${shop.cityIn}. ${count(
     posts.length,
     "запись",
     "записи",
     "записей"
-  )} — ${CATEGORY_LINE} — и ${count(
+  )}: ${CATEGORY_LINE}. ${count(
     TOTAL_MINUTES,
     "минута",
     "минуты",
@@ -49,19 +50,28 @@ export default function JournalPage() {
           </Rise>
 
           {/* "Журнал" measures 2.87em wide in Playfair italic at the mega
-              tracking. 30vw is the size that runs it gutter to gutter
-              without ever clipping — the binding case is 375px, where the
-              20px gutters leave 335px and the word draws 323. */}
-          <SplitText
-            as="h1"
-            delay={0.1}
-            stagger={0.06}
-            className="mega -ml-[0.015em] mt-[clamp(1.5rem,3vw,2.5rem)] text-[clamp(3.5rem,30vw,36rem)]"
-            segments={[{ text: "Журнал" }]}
-          />
+              tracking, so the column's own inline size divided by 2.90 runs it
+              gutter to gutter at every width. `cqw` rather than `vw` because a
+              desktop scrollbar is part of `vw` and left the word 90px short. */}
+          <div
+            style={{ containerType: "inline-size" }}
+            className="mt-[clamp(1.5rem,3vw,2.5rem)] overflow-x-clip"
+          >
+            <div style={{ "--text-mega": "calc(100cqw / 2.90)" } as CSSProperties}>
+              <SplitText
+                as="h1"
+                delay={0.1}
+                stagger={0.06}
+                className="mega -ml-[0.015em] block"
+                segments={[{ text: "Журнал" }]}
+              />
+            </div>
+          </div>
 
           <Rise delay={0.28} className="mt-[clamp(3rem,9vw,7rem)] flex md:justify-end">
-            <p className="label max-w-[32ch] md:text-right">
+            {/* `.note`, not `.label`: this is running copy, and DESIGN.md keeps
+                `.label` for eyebrows, meta and captions. */}
+            <p className="note max-w-[32ch] md:text-right">
               Всё, что мы рассказали бы вам в кресле, если бы хватало времени
               рассказать это как следует.
             </p>
@@ -110,7 +120,9 @@ export default function JournalPage() {
               priority
               sizes="100vw"
               parallax={7}
-              className="mt-6 aspect-[21/9] w-full md:mt-8"
+              /* 21:9 across a 350px column is a 150px letterbox, shorter than
+                 the two posts underneath it, which is backwards for the lead. */
+              className="mt-6 aspect-[16/9] w-full md:mt-8 md:aspect-[21/9]"
               objectPosition="center 45%"
             />
 

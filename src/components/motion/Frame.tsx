@@ -8,7 +8,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * The image block. Wipes open from the bottom edge while the photograph
- * itself drifts against the wipe — the two-speed reveal that makes a still
+ * itself drifts against the wipe: the two-speed reveal that makes a still
  * feel like footage.
  */
 export function Frame({
@@ -57,7 +57,17 @@ export function Frame({
       transition={{ duration: 1.25, delay, ease: EASE }}
       className={`relative overflow-hidden bg-ink/10 ${rounded ? "rounded-[10px]" : ""} ${className}`}
     >
-      <motion.div style={{ y }} className="absolute inset-[-14%_0]">
+      {/* MotionConfig's `reducedMotion="user"` only drops transform
+          *animations*; a scroll-driven transform is not one, so every
+          photograph kept drifting for anyone who had asked it not to. Killed
+          in CSS rather than in JS: `useReducedMotion` resolves differently on
+          the server and the client, which is a hydration mismatch, and an
+          `!important` rule beats the inline transform Motion writes. */}
+      <motion.div
+        data-parallax=""
+        style={{ y }}
+        className="absolute inset-[-14%_0]"
+      >
         <Image
           src={src}
           alt={alt}

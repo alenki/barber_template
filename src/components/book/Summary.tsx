@@ -5,7 +5,7 @@ import { count } from "@/lib/words";
 
 export type SummaryRow = {
   key: string;
-  /** Typewriter caption — "Зал", "Услуга", "Кресло". */
+  /** Typewriter caption: "Зал", "Услуга", "Кресло". */
   label: string;
   /** The choice itself, or null while it is still unmade. */
   value: string | null;
@@ -16,7 +16,7 @@ export type SummaryRow = {
 /**
  * What has been chosen so far, and what it costs. A rail on the right at
  * desktop width; a single wrapped line under the progress on a phone.
- * Filled rows are buttons — the fastest way back to a decision you regret.
+ * Filled rows are buttons; the fastest way back to a decision you regret.
  */
 export function SummaryRail({
   rows,
@@ -51,7 +51,7 @@ export function SummaryRail({
                   <button
                     type="button"
                     onClick={() => onJump(row.step)}
-                    aria-label={`Изменить: ${row.label.toLowerCase()} — сейчас ${value}`}
+                    aria-label={`Изменить: ${row.label.toLowerCase()}, сейчас ${value}`}
                     className="flex w-full items-baseline justify-between gap-4 py-3 text-left transition-opacity duration-500 hover:opacity-55"
                   >
                     <RowText label={row.label} value={value} />
@@ -62,13 +62,13 @@ export function SummaryRail({
                       <RowText label={row.label} value={value} />
                     ) : (
                       <>
-                        {/* 40% ink on ember measured 2.21:1 — a real label,
+                        {/* 40% ink on ember measured 2.21:1, a real label,
                             not decoration, so it has to clear 4.5:1. */}
-                        <span className="label shrink-0 opacity-70">
+                        <span className="label shrink-0 opacity-75">
                           {row.label}
                         </span>
                         <span className="label opacity-40" aria-hidden="true">
-                          —
+                          ·
                         </span>
                         <span className="sr-only">Ещё не выбрано</span>
                       </>
@@ -83,10 +83,10 @@ export function SummaryRail({
         <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
           <span className="label">Итого</span>
           <span className="display text-[clamp(1.35rem,2.2vw,2rem)] leading-none whitespace-nowrap italic">
-            {total === null ? "—" : money(total)}
+            {total === null ? "·" : money(total)}
           </span>
         </div>
-        <p className="label mt-2 text-right opacity-50">
+        <p className="label mt-2 text-right opacity-75">
           {minutes === null
             ? "Ничего не выбрано"
             : `${count(minutes, "минута", "минуты", "минут")} в кресле`}
@@ -99,7 +99,7 @@ export function SummaryRail({
 function RowText({ label, value }: { label: string; value: string }) {
   return (
     <>
-      <span className="label shrink-0 opacity-55">{label}</span>
+      <span className="label shrink-0 opacity-75">{label}</span>
       <span className="display min-w-0 flex-1 text-right text-[clamp(1rem,1.35vw,1.35rem)] leading-tight italic">
         {value}
       </span>
@@ -117,7 +117,7 @@ export function SummaryBar({
 }) {
   const filled = rows.filter((r) => r.value);
 
-  /* A <section>, not a <div> — `aria-label` is prohibited on the implicit
+  /* A <section>, not a <div>; `aria-label` is prohibited on the implicit
      generic role, so on a phone this running summary had no name at all. */
   return (
     <section
@@ -125,13 +125,13 @@ export function SummaryBar({
       className="mt-6 border-t border-current/20 pt-3 md:hidden"
     >
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="label opacity-50">Пока что</span>
+        <span className="label opacity-75">Пока что</span>
         {filled.length === 0 ? (
-          <span className="label opacity-40">Пока пусто</span>
+          <span className="label opacity-75">Пока пусто</span>
         ) : (
           filled.map((row) => (
             <span key={row.key} className="label">
-              <span className="opacity-40">/</span> {row.value}
+              <span aria-hidden="true" className="opacity-45">/</span> {row.value}
             </span>
           ))
         )}

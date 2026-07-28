@@ -1,48 +1,94 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 export type Tone = "ink" | "paper";
 
+export type ChromeSlab = {
+  /** The colour the chrome should draw *itself* in over this slab. */
+  tone: Tone;
+  /** The slab's own background, so chrome can lay an opaque bar in it. */
+  bg: string;
+};
+
+const INITIAL: ChromeSlab = { tone: "ink", bg: "#ff5a1f" };
+
 /**
- * The header floats over slabs that flip between ember, white and black.
- * Rather than tint the header, we read whichever slab is currently under it
- * and let it declare the ink colour via `data-tone`.
- *
- * The observer watches a 1px band sitting at the header's baseline.
+ * Backgrounds are set with Tailwind utilities, so the only honest source for
+ * "what colour is this slab" is the computed style. Photo slabs paint their
+ * image over a solid `bg-ink`, which is exactly the colour a bar wants, and a
+ * transparent wrapper walks up until it finds something opaque.
  */
-export function useChromeTone(offset = 72): Tone {
-  const [tone, setTone] = useState<Tone>("ink");
-  /* The header lives in the layout and survives route changes. Without the
+function readBackground(el: HTMLElement): string {
+  let node: HTMLElement | null = el;
+  while (node) {
+    const bg = getComputedStyle(node).backgroundColor;
+    if (bg && bg !== "transparent" && !bg.startsWith("rgba(0, 0, 0, 0")) {
+      return bg;
+    }
+    node = node.parentElement;
+  }
+  return INITIAL.bg;
+}
+
+/**
+ * The header and the Book pill float over slabs that flip between ember, white
+ * and black. Rather than tint them, we read whichever slab is currently under
+ * the header baseline and let it declare both the ink colour (`data-tone`) and
+ * its own background.
+ *
+ * Backgrounds never change once painted, so they are measured at collect time
+ * and the scroll handler only ever reads rects.
+ *
+ * A negative `offset` measures up from the bottom of the viewport instead:
+ * that is where the Book pill sits, and it is often over a different slab than
+ * the header is.
+ */
+export function useChromeSlab(offset = 72): ChromeSlab {
+  const [slab, setSlab] = useState<ChromeSlab>(INITIAL);
+  /* The chrome lives in the layout and survives route changes. Without the
      pathname in the deps the effect would keep measuring the *previous*
      route's detached slabs, and the header would sit ink-on-ink on any page
      reached by a client-side navigation. */
   const pathname = usePathname();
+  const current = useRef<ChromeSlab>(INITIAL);
 
   useEffect(() => {
-    let slabs: HTMLElement[] = [];
+    let slabs: { el: HTMLElement; tone: Tone; bg: string }[] = [];
 
     const collect = () => {
-      slabs = Array.from(document.querySelectorAll<HTMLElement>("[data-tone]"));
+      slabs = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-tone]")
+      ).map((el) => ({
+        el,
+        tone: (el.dataset.tone as Tone) ?? "ink",
+        bg: readBackground(el),
+      }));
     };
 
     const read = () => {
-      let current: Tone | null = null;
-      for (const slab of slabs) {
-        const r = slab.getBoundingClientRect();
-        if (r.top <= offset && r.bottom > offset) {
-          current = (slab.dataset.tone as Tone) ?? "ink";
+      const line = offset < 0 ? window.innerHeight + offset : offset;
+      let found: ChromeSlab | null = null;
+      for (const s of slabs) {
+        const r = s.el.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) {
+          found = { tone: s.tone, bg: s.bg };
         }
       }
-      if (current) setTone(current);
+      if (!found) return;
+      if (found.tone === current.current.tone && found.bg === current.current.bg) {
+        return;
+      }
+      current.current = found;
+      setSlab(found);
     };
 
     collect();
     read();
 
-    /* Slabs also appear late — a Suspense fallback swapping for the real
-       booking flow, for instance — so watch for them rather than assuming
+    /* Slabs also appear late (a Suspense fallback swapping for the real
+       booking flow, for instance), so watch for them rather than assuming
        the first query saw everything. */
     const mo = new MutationObserver(() => {
       collect();
@@ -59,5 +105,10 @@ export function useChromeTone(offset = 72): Tone {
     };
   }, [offset, pathname]);
 
-  return tone;
+  return slab;
+}
+
+/** Back-compat for callers that only want the ink colour. */
+export function useChromeTone(offset = 72): Tone {
+  return useChromeSlab(offset).tone;
 }

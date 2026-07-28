@@ -8,7 +8,7 @@ import { Frame } from "@/components/motion/Frame";
 /* ------------------------------------------------------------------
    content.ts owns every word of the post. This file owns the things it
    does not carry: the description of each photograph and which chair
-   wrote which entry. Both are static lookups keyed by slug — nothing is
+   wrote which entry. Both are static lookups keyed by slug; nothing is
    generated at render time, so the server and the client agree exactly.
    ------------------------------------------------------------------ */
 
@@ -47,7 +47,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     openGraph: {
-      title: `${post.title} — ${shop.name}`,
+      title: `${post.title} · ${shop.name}`,
       description: post.excerpt,
       type: "article",
       images: [post.image],
@@ -117,7 +117,7 @@ export default async function JournalPostPage({
             is set at the size the prose is actually read at. */}
         <div className="mx-auto max-w-[62ch] text-[1.15rem]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4">
-            <span className="label">Текст — {author.name}</span>
+            <span className="label">Текст: {author.name}</span>
             <span className="label text-ash">
               Кресло {author.chair} · {author.role}
             </span>
@@ -143,7 +143,7 @@ export default async function JournalPostPage({
           <div className="mt-12 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4 md:mt-16">
             <span className="label">{post.category}</span>
             <span className="label text-ash">
-              {shop.name} — {shop.city}, {shop.country}
+              {shop.name} · {shop.city}, {shop.country}
             </span>
           </div>
         </div>

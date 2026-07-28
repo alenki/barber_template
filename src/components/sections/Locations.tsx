@@ -3,7 +3,7 @@ import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
 
 /**
- * Locations — ember slab.
+ * Locations: ember slab.
  * One mega word with an inverted (ink-on-ember) count badge, then the three
  * rooms as tall 3:4 portraits over a hairline hours table. The whole card is
  * the map link; the `+` disc is the only thing that moves on hover.
@@ -27,7 +27,7 @@ function mapsUrl(address: string, city: string) {
   )}`;
 }
 
-const WALK_IN = "Без записи — если есть свободное кресло —";
+const WALK_IN = "Без записи, если есть свободное кресло.";
 
 export function Locations() {
   return (
@@ -36,8 +36,8 @@ export function Locations() {
       <div className="relative block w-fit max-w-full">
         {/* "Адреса" is six letters where "Locations" was nine, so the stock
             `--text-mega` clamp would leave it sitting at about 40% of the
-            slab. 24vw restores the proportion the section was drawn at —
-            roughly two thirds of the column — without ever reaching the
+            slab. 24vw restores the proportion the section was drawn at
+            (roughly two thirds of the column) without ever reaching the
             gutter, which is what keeps room for the count badge. */}
         <SplitText
           as="h2"
@@ -46,10 +46,13 @@ export function Locations() {
           stagger={0.06}
         />
 
+        {/* "Адреса" ends on an x-height "а", so a badge pinned tight to the
+            word's corner lands on the letter. It is pushed clear of both the
+            ascender line and the right edge instead. */}
         <Rise
           delay={0.45}
           y={14}
-          className="absolute top-[-0.4rem] right-[-0.6rem] md:top-[-1.1rem] md:right-[-1.5rem]"
+          className="absolute top-[-0.9rem] right-[-1.1rem] md:top-[-2.1rem] md:right-[-2.6rem]"
         >
           <span
             className="flex size-[clamp(2.6rem,5.6vw,5.5rem)] items-center justify-center rounded-full bg-ink text-ember"
@@ -124,7 +127,8 @@ export function Locations() {
 
       <Rise className="mt-16 flex justify-end md:mt-24">
         <p className="note m-0 max-w-[34ch] text-right">
-          {WALK_IN}{" "}
+          {WALK_IN}
+          <br />
           {/* whitespace-nowrap so the number cannot wrap into a two-line,
               33px-tall tap target the way it did at 375px. */}
           <a

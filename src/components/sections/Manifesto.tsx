@@ -5,7 +5,7 @@ import { Frame } from "@/components/motion/Frame";
 /**
  * The italic run is always the closing beat of the headline. Derived from the
  * string rather than written out, so swapping content.ts keeps the roman/italic
- * mix intact. Deterministic — same result on the server and the client.
+ * mix intact. Deterministic: same result on the server and the client.
  */
 function emphasise(line: string, tail = 2): Segment[] {
   const words = line.trim().split(/\s+/).filter(Boolean);

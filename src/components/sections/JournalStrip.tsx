@@ -1,10 +1,21 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { posts } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
 
 /**
- * Journal — paper slab.
+ * "Журнал" measures 2.87em wide in Playfair italic at the `.mega` tracking, so
+ * dividing the column's own inline size by 2.90 runs it gutter to gutter with a
+ * hair of slack for the italic overhang. Without the fit it fell back to the
+ * stock `--text-mega` clamp and drew at under half the column; the one section
+ * title on the site that read as a subhead.
+ */
+const MEGA_FIT = { "--text-mega": "calc(100cqw / 2.90)" } as CSSProperties;
+const MEGA_CONTAINER = { containerType: "inline-size" } as CSSProperties;
+
+/**
+ * Journal: paper slab.
  * One mega word, a typewriter note pinned to the far edge, and three posts
  * that step down the page instead of sitting in a tidy row.
  *
@@ -14,18 +25,22 @@ import { Frame } from "@/components/motion/Frame";
 export function JournalStrip() {
   return (
     <section data-tone="ink" className="slab bg-paper text-ink">
-      {/* Title row: the word, and the note pushed to the opposite edge. */}
-      <div className="flex items-start justify-between gap-6">
-        <SplitText
-          as="h2"
-          className="mega -ml-[0.015em]"
-          segments={[{ text: "Журнал" }]}
-          stagger={0.06}
-        />
-        <Rise delay={0.2} className="shrink-0 pt-[0.6em]">
-          <p className="label max-w-[16ch] text-right">Заметки из кресла</p>
-        </Rise>
+      {/* The word runs the full column, so the note sits under it rather than
+          beside it. */}
+      <div style={MEGA_CONTAINER} className="overflow-x-clip">
+        <div style={MEGA_FIT}>
+          <SplitText
+            as="h2"
+            className="mega -ml-[0.015em] block"
+            segments={[{ text: "Журнал" }]}
+            stagger={0.06}
+          />
+        </div>
       </div>
+
+      <Rise delay={0.2} className="mt-8 flex md:mt-10 md:justify-end">
+        <p className="note max-w-[24ch] md:text-right">Заметки из кресла</p>
+      </Rise>
 
       <div className="mt-10 border-t border-current/20 md:mt-14" />
 
@@ -33,7 +48,7 @@ export function JournalStrip() {
         {posts.map((post, i) => (
           <li
             key={post.slug}
-            className={i === 1 ? "md:mt-16" : i === 2 ? "md:mt-32" : ""}
+            className={i === 1 ? "md:mt-10" : i === 2 ? "md:mt-20" : ""}
           >
             <Rise delay={i * 0.08}>
               <Link href={`/journal/${post.slug}`} className="group block">

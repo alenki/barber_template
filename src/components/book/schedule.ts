@@ -4,7 +4,7 @@
  * Everything here is a pure function of its arguments, so the same choices
  * always produce the same days, the same free hours and the same reference
  * code. The only real date on the page is captured once inside an effect and
- * handed to `buildDays` — nothing calls `new Date()` while rendering.
+ * handed to `buildDays`; nothing calls `new Date()` while rendering.
  */
 
 import { locations, services, barbers } from "@/lib/content";
@@ -31,7 +31,7 @@ export const duration = (min: number) => {
  */
 export const ANY_CHAIR = {
   id: "any",
-  chair: "—",
+  chair: "·",
   name: "Кто свободен",
   role: "Без предпочтений",
   detail: "Дадим кресло, которое лучше подходит под выбранную услугу.",
@@ -45,7 +45,7 @@ export const WEEKDAY = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"] 
 
 /**
  * How an hours label in content.ts names each weekday. Russian abbreviations
- * are not prefixes of the full words — "суббота" does not contain "сб" — so a
+ * are not prefixes of the full words ("суббота" does not contain "сб"), so a
  * single key per day is not enough and each one carries its alternates. The
  * English keys are kept so an untranslated hours table still parses.
  */
@@ -115,7 +115,7 @@ export const monthShort = (day: Day) => MONTH[day.month];
 
 /**
  * Reads the hours table in content.ts rather than restating it. A label is
- * either a single day ("Суббота") or a range ("Пн — Пт"); both resolve to
+ * either a single day ("Суббота") or a range ("Пн-Пт"); both resolve to
  * the set of weekday numbers they cover.
  */
 function weekdaysOf(label: string): number[] {
@@ -130,7 +130,7 @@ function weekdaysOf(label: string): number[] {
     return { i, at: at ?? -1 };
   }).filter((h) => h.at >= 0);
 
-  if (hits.length === 2 && /[—–-]/.test(l)) {
+  if (hits.length === 2 && /[-–]/.test(l)) {
     hits.sort((a, b) => a.at - b.at);
     const out: number[] = [];
     for (let i = hits[0].i; ; i = (i + 1) % 7) {
@@ -142,7 +142,7 @@ function weekdaysOf(label: string): number[] {
   return hits.map((h) => h.i);
 }
 
-/** "10:00 — 20:00" → [600, 1200]. "Выходной" → null. */
+/** "10:00-20:00" → [600, 1200]. "Выходной" → null. */
 function windowOf(time: string): [number, number] | null {
   const m = time.match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
   if (!m) return null;
@@ -174,7 +174,7 @@ export type Slot = { start: number; end: number; taken: boolean };
 
 /**
  * A stable 32-bit hash of two small integers. Used instead of `Math.random`
- * so the same day always shows the same booked-out hours — on the server, on
+ * so the same day always shows the same booked-out hours: on the server, on
  * the client, and on a reload.
  */
 function hash2(a: number, b: number) {
@@ -194,7 +194,7 @@ function pressure(dayIndex: number) {
 
 /**
  * Minutes past midnight, local. Used only to hide hours that have already
- * gone — never called during render.
+ * gone; never called during render.
  */
 export function minutesNow(): number {
   const d = new Date();
@@ -245,7 +245,7 @@ export function slotsFor(
       taken: hash2(dayIndex, i) % 100 < pressure(dayIndex),
     });
   }
-  /* A room is never completely gone — the last hour of the day survives. */
+  /* A room is never completely gone; the last hour of the day survives. */
   if (out.length && out.every((s) => s.taken)) out[out.length - 1].taken = false;
   return out;
 }
@@ -254,12 +254,12 @@ export const freeCount = (slots: Slot[]) => slots.filter((s) => !s.taken).length
 
 /* -------------------------------------------------------------- reference */
 
-/* Cyrillic, because the code gets read down a phone. О, З and Ч are left out —
+/* Cyrillic, because the code gets read down a phone. О, З and Ч are left out;
    they are heard as nought, three and four. */
 const CODE_LETTERS = "АБВГДЕЖКЛМНПРСТУФХЦШЭЮЯ";
 
 /**
- * FNV-1a over the choices. Not random, not sequential — the same booking
+ * FNV-1a over the choices. Not random, not sequential; the same booking
  * always produces the same code, which is what makes it quotable back to us.
  */
 export function referenceCode(parts: (string | number | null)[]) {

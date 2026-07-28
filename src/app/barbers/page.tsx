@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "мастер",
     "мастера",
     "мастеров"
-  )} «${shop.name}» ${shop.cityIn} — кто в каком кресле, кто в чём силён и как записаться к конкретному.`,
+  )} «${shop.name}» ${shop.cityIn}: кто в каком кресле, кто в чём силён и как записаться к конкретному.`,
 };
 
 /* Everything below is derived from content.ts. Nothing is counted by hand and
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 const TOTAL_YEARS = barbers.reduce((sum, b) => sum + b.years, 0);
 const FIRST_CHAIR = barbers[0].chair;
 const LAST_CHAIR = barbers[barbers.length - 1].chair;
-/* "Chair 06" when there are five — the one we are hiring for. */
+/* "Chair 06" when there are five; the one we are hiring for. */
 const NEXT_CHAIR = String(barbers.length + 1).padStart(FIRST_CHAIR.length, "0");
 
 /* The one line on the page that is not a name, a number or a bio. */
 const APPROACH =
-  "Кресло здесь — это не строчка в графике, а человек, который помнит форму вашей головы.";
+  "Кресло здесь не строчка в графике, а человек, который помнит форму вашей головы.";
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0];
 const surname = (name: string) => name.trim().split(/\s+/).slice(1).join(" ");
@@ -41,14 +41,14 @@ export default function BarbersPage() {
       {/* ── the ember opener: one sentence, dropped a third of a screen ── */}
       <section data-tone="ink" className="relative bg-ember text-ink">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
-          <Rise>
+          <Rise className="border-t border-current/20 pt-4">
             <p className="label">
               {spellNone(barbers.length, "n")}{" "}
               {plural(barbers.length, "кресло", "кресла", "кресел")}
             </p>
           </Rise>
 
-          {/* `text-hero` is a registered utility — never text-[var(--…)]. */}
+          {/* `text-hero` is a registered utility; never text-[var(--…)]. */}
           <SplitText
             as="h1"
             delay={0.12}
@@ -64,7 +64,7 @@ export default function BarbersPage() {
             className="mt-[clamp(4rem,12vw,9rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
           >
             <span className="label">
-              Кресла {FIRST_CHAIR} — {LAST_CHAIR}
+              Кресла {FIRST_CHAIR}-{LAST_CHAIR}
             </span>
             <span className="label">{spellYears(TOTAL_YEARS)} на всех</span>
             <span className="label">{shop.city}</span>
@@ -84,7 +84,7 @@ export default function BarbersPage() {
       <section data-tone="ink" className="bg-ember text-ink">
         <div className="edge py-[clamp(5rem,11vw,12rem)]">
           <Rise className="ml-auto max-w-[34ch] border-t border-current/20 pt-5">
-            <p className="label">Кресло {NEXT_CHAIR} — свободно</p>
+            <p className="label">Кресло {NEXT_CHAIR} · свободно</p>
             <p className="note mt-4">
               Мы берём людей раз в год, медленно и только через разговор. Если
               вы стрижёте так, будто последние два миллиметра имеют значение,
@@ -106,7 +106,7 @@ export default function BarbersPage() {
 
 /**
  * A barber gets a whole screen. Portrait on the outer edge, everything else
- * held in a narrow column across the gap — odd chairs left, even chairs right,
+ * held in a narrow column across the gap: odd chairs left, even chairs right,
  * so the eye walks down the page instead of marching.
  *
  * `children` is the slab that follows this one, kept inside the map so the
@@ -189,7 +189,7 @@ function Chair({
               </Rise>
 
               {/* `text-xl` collides with a Tailwind default size key and drags
-                  its stock leading in over `.display`'s .86 — restate it. */}
+                  its stock leading in over `.display`'s .86, so restate it. */}
               <SplitText
                 as="h2"
                 delay={0.08}
@@ -229,7 +229,7 @@ function Chair({
               <Rise delay={0.34} className="mt-[clamp(2.5rem,5vw,4rem)]">
                 <Link
                   href={`/book?barber=${barber.id}`}
-                  className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember"
+                  className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember-deep"
                 >
                   {/* "Записаться к Артёму" would need the dative of a name
                       content.ts only carries in the nominative, and Russian

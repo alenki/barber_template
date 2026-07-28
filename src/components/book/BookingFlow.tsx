@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { barbers, locations, services, shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
-import { OptionRow, ROW_BLEED } from "./OptionRow";
+import { OptionRow } from "./OptionRow";
 import { SummaryBar, SummaryRail, type SummaryRow } from "./Summary";
 import { TimeStep } from "./TimeStep";
 import { DetailsForm, type Details } from "./DetailsForm";
@@ -54,13 +54,13 @@ const STEPS = [
       "залов"
     )}.`,
     italic: "Выберите один.",
-    note: "Цены и кресла во всех трёх одинаковые. Часы работы немного разные, а воскресенье отличается сильнее всего.",
+    note: "Цены и кресла везде одинаковые. Часы работы немного разные, а воскресенье отличается сильнее всего.",
   },
   {
     eyebrow: "Услуга",
     roman: "Что будем",
     italic: "делать?",
-    note: `Одна услуга — одна посадка. Если нужно две подряд в одном кресле — стрижка и бритьё вместе — позвоните на ${shop.phone}, и мы соберём запись вручную.`,
+    note: `Одна услуга, одна посадка. Если нужно две подряд в одном кресле (стрижка и бритьё вместе), позвоните на ${shop.phone}, и мы соберём запись вручную.`,
   },
   {
     eyebrow: "Кресло",
@@ -83,7 +83,7 @@ const STEPS = [
     eyebrow: "Вы",
     roman: "Для кого",
     italic: "держим кресло?",
-    note: "Сейчас ничего не списывается. Рассчитаетесь в конце — картой или наличными, а перенести время бесплатно можно не позже чем за шесть часов.",
+    note: "Сейчас ничего не списывается. Рассчитаетесь в кресле картой, СБП или наличными, а перенести время бесплатно можно не позже чем за шесть часов.",
   },
 ] as const;
 
@@ -114,7 +114,7 @@ const EMPTY: Chosen = {
 export function BookingFlow() {
   const params = useSearchParams();
 
-  /* /barbers links in with ?barber=amir — honour it, but still ask for the
+  /* /barbers links in with ?barber=artem; honour it, but still ask for the
      room and the service first. */
   const preset = params.get("barber");
   const presetBarber =
@@ -130,7 +130,7 @@ export function BookingFlow() {
   const [booking, setBooking] = useState<Booking | null>(null);
 
   /* The only real date on the page. Read through useSyncExternalStore so the
-     server renders `null` and the client renders today's date — no hydration
+     server renders `null` and the client renders today's date, so no hydration
      mismatch, and no setState cascading out of an effect. `todaySnapshot` is
      memoised at module scope because getSnapshot must be referentially stable. */
   const startISO = useSyncExternalStore(
@@ -183,7 +183,7 @@ export function BookingFlow() {
   };
 
   const pickService = (id: string) => {
-    /* The slot grid is cut from the service length — drop the hour, keep the day. */
+    /* The slot grid is cut from the service length: drop the hour, keep the day. */
     setChosen((c) => ({ ...c, service: id, time: null }));
     setStep(3);
   };
@@ -273,11 +273,11 @@ export function BookingFlow() {
               ? "Готово"
               : `Шаг ${String(step).padStart(2, "0")} / ${String(
                   STEP_COUNT
-                ).padStart(2, "0")} — ${current.eyebrow}`}
+                ).padStart(2, "0")} · ${current.eyebrow}`}
           </p>
 
           {done ? (
-            <span className="label opacity-55">{shop.city}</span>
+            <span className="label opacity-75">{shop.city}</span>
           ) : step > 1 ? (
             <button
               type="button"
@@ -293,7 +293,7 @@ export function BookingFlow() {
               Назад
             </button>
           ) : (
-            <span className="label opacity-55">{shop.city}</span>
+            <span className="label opacity-75">{shop.city}</span>
           )}
         </div>
 
@@ -318,8 +318,8 @@ export function BookingFlow() {
                 key={step}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -18 }}
-                transition={{ duration: 0.45, ease: EASE }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.35, ease: EASE }}
                 ref={stepPanel}
                 tabIndex={-1}
                 className="outline-none"
@@ -328,7 +328,7 @@ export function BookingFlow() {
                   <Confirmation booking={booking} onRestart={restart} />
                 ) : (
                   <>
-                    {/* h1, not h2 — the step question is the only heading on
+                    {/* h1, not h2: the step question is the only heading on
                         the page, and /book was the one route without one. */}
                     <SplitText
                       as="h1"
@@ -344,9 +344,9 @@ export function BookingFlow() {
 
                     <Rise
                       animateOnMount
-                      delay={0.16}
+                      delay={0.08}
                       y={16}
-                      duration={0.7}
+                      duration={0.55}
                       className="mt-[clamp(1.5rem,3vw,2.5rem)]"
                     >
                       <p className="note max-w-[34ch] opacity-75 md:ml-auto md:text-right">
@@ -356,9 +356,9 @@ export function BookingFlow() {
 
                     <Rise
                       animateOnMount
-                      delay={0.24}
+                      delay={0.14}
                       y={20}
-                      duration={0.7}
+                      duration={0.55}
                       className="mt-[clamp(2.5rem,5vw,4.5rem)]"
                     >
                       <StepBody
@@ -427,7 +427,7 @@ function StepBody({
     const held = barbers.find((b) => b.id === presetBarber);
     return (
       <>
-        <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+        <ul className="m-0 list-none p-0">
           {locations.map((location, i) => (
             <OptionRow
               key={location.id}
@@ -442,8 +442,8 @@ function StepBody({
           ))}
         </ul>
         {held ? (
-          <p className="label mt-6 opacity-60">
-            Кресло {held.chair} — {held.name}: уже выбрано за вас.
+          <p className="label mt-6 opacity-75">
+            Кресло {held.chair}, {held.name}: уже выбрано за вас.
           </p>
         ) : null}
       </>
@@ -452,7 +452,7 @@ function StepBody({
 
   if (step === 2) {
     return (
-      <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+      <ul className="m-0 list-none p-0">
         {services.map((s) => (
           <OptionRow
             key={s.id}
@@ -471,7 +471,7 @@ function StepBody({
 
   if (step === 3) {
     return (
-      <ul className="m-0 list-none p-0" style={ROW_BLEED}>
+      <ul className="m-0 list-none p-0">
         {barbers.map((b) => (
           <OptionRow
             key={b.id}
@@ -503,10 +503,10 @@ function StepBody({
 
         <OptionRow
           key={ANY_CHAIR.id}
-          index="—"
+          index="·"
           media={
             <span className="grid size-[clamp(3.25rem,5.5vw,4.75rem)] place-items-center rounded-[10px] border border-current/25">
-              <span className="label leading-none opacity-70">Любой</span>
+              <span className="label leading-none opacity-75">Любой</span>
             </span>
           }
           title={ANY_CHAIR.name}

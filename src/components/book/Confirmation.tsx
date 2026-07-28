@@ -41,7 +41,7 @@ export function Confirmation({
   booking: Booking;
   onRestart: () => void;
 }) {
-  const slotWindow = `${clock(booking.start)} — ${clock(
+  const slotWindow = `${clock(booking.start)}-${clock(
     booking.start + booking.minutes
   )}`;
 
@@ -66,7 +66,7 @@ export function Confirmation({
       <Rise animateOnMount className="border-t border-current/20 pt-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
           <span className="label">Бронь {booking.reference}</span>
-          <span className="label opacity-55">
+          <span className="label opacity-75">
             {booking.dateLabel} · {clock(booking.start)}
           </span>
         </div>
@@ -91,7 +91,7 @@ export function Confirmation({
           <dl className="m-0 grid grid-cols-[7.5rem_1fr] gap-0 sm:grid-cols-[10rem_1fr]">
             {lines.map((line) => (
               <div key={line.label} className="contents">
-                <dt className="label border-t border-current/15 py-4 opacity-55">
+                <dt className="label border-t border-current/15 py-4 opacity-75">
                   {line.label}
                 </dt>
                 {/* min-w-0 + break-words: a long unbroken email sets the
@@ -109,21 +109,21 @@ export function Confirmation({
 
           <div className="mt-[clamp(2rem,4vw,3rem)] flex items-end justify-between gap-6 border-t border-current/20 pt-5">
             <div>
-              <span className="label opacity-55">Итого</span>
+              <span className="label opacity-75">Итого</span>
               <span className="display mt-2 block text-[clamp(2.25rem,5vw,4rem)] leading-none whitespace-nowrap">
                 {money(booking.price)}
               </span>
             </div>
             <div className="text-right">
-              <span className="label opacity-55">В кресле</span>
+              <span className="label opacity-75">В кресле</span>
               <span className="display mt-2 block text-[clamp(1.35rem,2.4vw,2rem)] leading-none italic">
                 {duration(booking.minutes)}
               </span>
             </div>
           </div>
 
-          <p className="label mt-4 opacity-55">
-            Сейчас ничего не списано. Рассчитаетесь в кресле — картой или
+          <p className="label mt-4 opacity-75">
+            Сейчас ничего не списано. Рассчитаетесь в кресле картой или
             наличными.
           </p>
         </Rise>
@@ -135,7 +135,7 @@ export function Confirmation({
           className="md:col-span-4 md:col-start-9"
         >
           <div className="flex size-[clamp(11rem,20vw,16rem)] flex-col items-center justify-center gap-2 rounded-full bg-ink text-ember">
-            <span className="label opacity-60">Номер брони</span>
+            <span className="label opacity-75">Номер брони</span>
             <span className="display text-[clamp(1.25rem,2.4vw,2rem)] italic">
               {booking.reference}
             </span>
@@ -177,10 +177,10 @@ export function Confirmation({
         className="mt-[clamp(2.5rem,5vw,4rem)] border-t border-current/20 pt-5"
       >
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
-          <p className="note max-w-[48ch] opacity-70">
-            Эта форма записи — демонстрация. Запись не создана, письмо не
+          <p className="note max-w-[48ch] opacity-75">
+            Эта форма записи демонстрационная. Запись не создана, письмо не
             отправлено и ничего не списано: данные выше существуют только в этой
-            вкладке браузера. «{shop.name}» — вымышленный барбершоп {shop.cityIn}.
+            вкладке браузера. Барбершоп «{shop.name}» {shop.cityIn} вымышленный.
           </p>
 
           <div className="flex shrink-0 flex-wrap items-center gap-8">

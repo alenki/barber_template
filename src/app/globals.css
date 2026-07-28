@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 /* ============================================================
-   МИЛЛИМЕТР — design tokens
+   МИЛЛИМЕТР · design tokens
    Three colours. No gradients. No shadows except one lifted pill.
    The whole system is: enormous type, enormous space, one signal colour.
-   Every fallback below carries Cyrillic — a Latin-only fallback would
+   Every fallback below carries Cyrillic; a Latin-only fallback would
    drop the site into a substitute face mid-word on first paint.
    ============================================================ */
 
@@ -19,7 +19,7 @@
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-typewriter: var(--font-typewriter), "Courier New", monospace;
 
-  /* Fluid type scale — every step is a clamp so nothing needs breakpoints */
+  /* Fluid type scale; every step is a clamp so nothing needs breakpoints */
   --text-mega: clamp(3.5rem, 15.5vw, 17rem);
   --text-hero: clamp(2.75rem, 8.4vw, 9rem);
   --text-xl: clamp(2.25rem, 5.6vw, 5.5rem);
@@ -28,7 +28,7 @@
 
   /* `lg` and `xl` collide with Tailwind's own size keys, so its default
      `--text-lg--line-height` (1.556) and `--text-xl--line-height` (1.4)
-     survive and outrank `.display`'s 0.86 — every card title on the site was
+     survive and outrank `.display`'s 0.86; every card title on the site was
      silently setting at magazine leading. Pinning them here fixes all of it at
      once. Smaller display sizes want fractionally more leading than the mega
      ones, hence 0.95/0.9 rather than a flat 0.86. */
@@ -76,19 +76,20 @@
   }
 
   /* currentColor alone goes invisible whenever a control's own type colour
-     matches the slab behind it (ember type on an ember slab, for instance).
-     The paper halo sitting outside the ink ring means one of the two is always
-     legible, on all three slab colours. */
+     matches the slab behind it (ember type on an ember slab, for instance), so
+     the ring is drawn in the slab's opposite instead. Ink on ember measures
+     6.4:1 and ink on paper 21:1; both are plenty on their own, and a halo
+     there only turned every focused input into a loud white box. */
   :focus-visible {
     outline: 2px solid var(--color-ink);
     outline-offset: 3px;
-    box-shadow: 0 0 0 5px var(--color-paper);
   }
 
-  /* On ink slabs the ring inverts, so the ink outline reads against the halo. */
+  /* Ink slabs invert. These are also the slabs that carry photographs, where a
+     paper ring alone can land on a bright highlight, hence the ink halo. */
   [data-tone="paper"] :focus-visible {
     outline-color: var(--color-paper);
-    box-shadow: 0 0 0 5px var(--color-ink);
+    box-shadow: 0 0 0 5px rgb(10 9 8 / 0.9);
   }
 
   img {
@@ -108,6 +109,13 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* The mobile menu is a full-screen overlay; the Book pill sits a layer above
+     it and duplicates the «Записаться» the menu already lists. `visibility`
+     rather than `opacity` so it also leaves the tab order. */
+  body[data-menu="open"] [data-sticky-book] {
+    visibility: hidden;
   }
 
   /* A whisper of press grain. Enough to kill the flatness of pure vector,
@@ -130,7 +138,7 @@
 
 /* Playfair's `opsz` axis runs 5–1200: the higher it goes the thinner the
    hairlines and the sharper the serifs. These headlines are set enormous, so
-   they want the display end of it — 96 is where the Didone contrast arrives
+   they want the display end of it; 96 is where the Didone contrast arrives
    without the thins breaking up on a phone. */
 @utility display {
   font-family: var(--font-display);
@@ -153,9 +161,15 @@
   font-variation-settings: "opsz" 200;
 }
 
+/* A bare `Nvw` middle term reaches the maximum only at ~1600px, so these two
+   were pinned at their *minimum* for every phone, tablet and laptop on the
+   market: fluid in theory, 10.88px in practice, on uppercase mono carrying
+   the hours tables, the addresses and every margin note. The middle term is
+   written as `vw + rem` so the ramp does its work across the range the site is
+   actually read at, and the floor is a size that survives a phone. */
 @utility label {
   font-family: var(--font-typewriter);
-  font-size: clamp(0.68rem, 0.82vw, 0.82rem);
+  font-size: clamp(0.75rem, 0.32vw + 0.63rem, 0.84rem);
   line-height: 1.55;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -163,7 +177,7 @@
 
 @utility note {
   font-family: var(--font-typewriter);
-  font-size: clamp(0.72rem, 0.88vw, 0.9rem);
+  font-size: clamp(0.8rem, 0.36vw + 0.68rem, 0.92rem);
   line-height: 1.7;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -223,5 +237,14 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  /* Every `<Frame>`'s parallax layer. Motion writes this transform inline from
+     a scroll position rather than from an animation, so `reducedMotion="user"`
+     never sees it, and reading the preference in JS would resolve differently
+     on the server and the client. An author `!important` beats a plain inline
+     style, which makes CSS the only place this can be switched off cleanly. */
+  [data-parallax] {
+    transform: none !important;
   }
 }

@@ -3,6 +3,10 @@ import Link from "next/link";
 import { shop, nav, locations, BOOK_LABEL } from "@/lib/content";
 import { SplitText } from "@/components/motion/SplitText";
 
+/* A server component, so this is stamped at build time and never differs
+   between the server and the client. */
+const YEAR = new Date().getFullYear();
+
 /** Where a Moscow shop actually lives. Instagram is not one of them. */
 const SOCIAL = [
   { label: "Telegram", href: shop.telegram },
@@ -13,6 +17,9 @@ const SOCIAL = [
 /**
  * Full-bleed photograph, links laid over it, and the closing line
  * sitting on the bottom edge at the largest size on the site.
+ *
+ * Everything here is small type on a photograph, so nothing is allowed to sit
+ * at low opacity: the scrim does the contrast work, and the links stay solid.
  */
 export function Footer() {
   return (
@@ -25,45 +32,54 @@ export function Footer() {
         alt={`Зал «${locations[0].name}» после закрытия`}
         fill
         sizes="100vw"
-        className="-z-10 object-cover opacity-70"
+        className="-z-10 object-cover opacity-65"
       />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/40 to-ink/60" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/55 to-ink/65" />
 
-      <div className="edge grid gap-12 pt-32 md:grid-cols-[1fr_auto_auto] md:gap-16 md:pt-40">
-        <div className="max-w-xs">
-          <p className="label opacity-70">
-            {shop.name} — {shop.city}, {shop.country}
+      <div className="edge grid gap-12 pt-32 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-16 md:pt-40">
+        <div>
+          <p className="label text-paper/70">
+            {shop.name} · {shop.city}, {shop.country}
           </p>
+          {/* Contact is data, not display: it stays in the UI face and is
+              never allowed to break a phone number across two lines. */}
           <a
             href={`mailto:${shop.email}`}
-            className="mt-4 block text-lg underline-offset-4 hover:underline"
+            className="mt-4 -my-1 block w-fit py-1 text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-ember hover:underline"
           >
             {shop.email}
           </a>
           <a
             href={shop.phoneHref}
-            className="mt-1 block text-lg underline-offset-4 hover:underline"
+            className="-my-1 block w-fit py-1 text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-ember hover:underline"
           >
             {shop.phone}
           </a>
         </div>
 
-        <nav className="flex flex-col gap-3">
+        <nav className="flex flex-col gap-1">
           {[...nav, { label: BOOK_LABEL, href: "/book" }].map((item) => (
-            <Link key={item.href} href={item.href} className="ui opacity-80 hover:opacity-100">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="ui w-fit py-1.5 transition-colors duration-500 hover:text-ember"
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
           {SOCIAL.map((s) => (
             <a
               key={s.label}
               href={s.href}
               target="_blank"
               rel="noreferrer"
-              className="ui opacity-80 hover:opacity-100"
+              /* min-w: "VK" is two letters and would otherwise be a 19px-wide
+                 target. Nothing is drawn around it, so the extra hit area is
+                 invisible. */
+              className="ui w-fit min-w-12 py-1.5 transition-colors duration-500 hover:text-ember"
             >
               {s.label}
             </a>
@@ -75,7 +91,7 @@ export function Footer() {
         {locations.map((l) => (
           <div key={l.id}>
             <p className="ui mb-2">{l.name}</p>
-            <p className="label opacity-70">
+            <p className="label text-paper/75">
               {l.address}
               <br />
               {l.city}
@@ -91,17 +107,15 @@ export function Footer() {
           segments={[{ text: "Ваше кресло" }, { text: "уже ждёт.", italic: true }]}
           stagger={0.07}
         />
-        {/* The sticky Book pill is ~76px off the bottom edge; without the
-            extra padding it lands on top of this line, which is the one place
-            on the site where content is guaranteed to sit under it. */}
-        <div className="edge mt-8 flex flex-wrap items-center justify-between gap-4 pb-28 md:pb-10">
-          <p className="label opacity-60">
-            © {shop.founded}—2026 {shop.name}. Все права защищены.
+        {/* The Book pill owns the bottom-right corner of every screen, so the
+            legal line runs left-to-right out of that corner rather than into
+            it, and keeps a pill's worth of clearance underneath. */}
+        <div className="edge mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 pb-28 md:pb-14">
+          <p className="label text-paper/65">
+            © {shop.founded}-{YEAR} {shop.name}. Все права защищены.
           </p>
-          <div className="flex gap-6">
-            <span className="label opacity-60">Конфиденциальность</span>
-            <span className="label opacity-60">Условия</span>
-          </div>
+          <span className="label text-paper/65">Конфиденциальность</span>
+          <span className="label text-paper/65">Условия</span>
         </div>
       </div>
     </footer>

@@ -3,24 +3,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import type { PanInfo } from "motion/react";
-import { shop, testimonials } from "@/lib/content";
+import { rating, shop, testimonials } from "@/lib/content";
 import { Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
 /* Aliased: `count` is already the number of reviews in this component. */
-import { count as countOf } from "@/lib/words";
+import { count as countOf, decimal } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/** Derived here rather than in content.ts: every review below is a five-star one. */
-const RATING = "5.0";
+const RATING = decimal(rating);
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Client reviews as a two-up slider on a paper slab.
+ * Client reviews as a two-up slider on an ink slab.
  * Grayscale portrait on the left, name in ember italic Bodoni on the right,
  * the quote underneath it with ember quotation marks. Arrows, drag and a
  * hairline progress rule all read the same index.
+ *
+ * Ink rather than paper: Chairs above it is already a paper slab, and two in a
+ * row erase the boundary between them. It also gives the long scroll its one
+ * dark beat before the closing slabs, and grayscale portraits want black.
  */
 export function Testimonials() {
   const count = testimonials.length;
@@ -36,7 +39,6 @@ export function Testimonials() {
   const [index, setIndex] = useState(0);
 
   const maxIndex = Math.max(0, count - perView);
-  const pages = maxIndex + 1;
   const draggable = maxIndex > 0;
 
   /* One slide is always exactly the viewport divided by however many we show. */
@@ -44,7 +46,9 @@ export function Testimonials() {
     const el = viewportRef.current;
     if (!el) return;
 
-    const mq = window.matchMedia("(min-width: 768px)");
+    /* Two-up needs a real column for the quote, and at 768px the pair are 171px
+       wide apiece. The split waits for the desktop breakpoint. */
+    const mq = window.matchMedia("(min-width: 1024px)");
     const measure = () => {
       const per = mq.matches ? 2 : 1;
       setPerView(per);
@@ -98,9 +102,9 @@ export function Testimonials() {
 
   return (
     <section
-      data-tone="ink"
+      data-tone="paper"
       aria-labelledby="testimonials-eyebrow"
-      className="slab bg-paper text-ink"
+      className="slab bg-ink text-paper"
     >
       {/* Eyebrow, rating badge, arrows */}
       <div className="flex items-start justify-between gap-5">
@@ -118,7 +122,7 @@ export function Testimonials() {
             {/* Deliberately not "на Яндексе": the shop is invented, and a
                 template should not ship a fabricated third-party rating that
                 a real barbershop might publish unchanged. */}
-            <span className="label text-ash">
+            <span className="label text-paper/60">
               {RATING} в среднем · {countOf(count, "отзыв", "отзыва", "отзывов")}
             </span>
           </span>
@@ -130,7 +134,7 @@ export function Testimonials() {
             onClick={() => goTo(index - 1)}
             disabled={index === 0}
             aria-label="Предыдущий отзыв"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/25 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-ink enabled:hover:bg-ink enabled:hover:text-paper disabled:opacity-20 md:h-14 md:w-14"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-paper enabled:hover:bg-paper enabled:hover:text-ink disabled:opacity-25 md:h-14 md:w-14"
           >
             <span aria-hidden="true" className="text-[1.05rem]">
               ←
@@ -141,7 +145,7 @@ export function Testimonials() {
             onClick={() => goTo(index + 1)}
             disabled={index >= maxIndex}
             aria-label="Следующий отзыв"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/25 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-ink enabled:hover:bg-ink enabled:hover:text-paper disabled:opacity-20 md:h-14 md:w-14"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 leading-none transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] enabled:hover:border-paper enabled:hover:bg-paper enabled:hover:text-ink disabled:opacity-25 md:h-14 md:w-14"
           >
             <span aria-hidden="true" className="text-[1.05rem]">
               →
@@ -173,15 +177,19 @@ export function Testimonials() {
               role="group"
               aria-roledescription="slide"
               aria-label={`Отзыв ${i + 1} из ${count}`}
-              className="flex shrink-0 grow-0 basis-full flex-col gap-6 pr-[var(--gutter)] md:basis-1/2 md:flex-row md:items-start md:gap-8"
+              /* pl-[3px]: the next slide's box starts exactly on the clip
+                 edge, and Playfair's « has enough left side bearing to draw a
+                 pixel of ember outside it: a stray orange tick at the right
+                 edge of every phone screenshot. */
+              className="flex shrink-0 grow-0 basis-full flex-col gap-6 pr-[var(--gutter)] pl-[3px] lg:basis-1/2 lg:flex-row lg:items-start lg:gap-8"
             >
               <Frame
                 src={t.image}
                 alt={`Чёрно-белый портрет: ${t.name}, клиент «${shop.name}»`}
-                sizes="(min-width: 768px) 200px, 46vw"
+                sizes="(min-width: 1024px) 200px, 46vw"
                 parallax={7}
                 delay={i * 0.06}
-                className="aspect-[3/4] w-[46%] max-w-[190px] shrink-0 grayscale md:w-[clamp(120px,13vw,200px)] md:max-w-none"
+                className="aspect-[3/4] w-[46%] max-w-[190px] shrink-0 grayscale lg:w-[clamp(120px,13vw,200px)] lg:max-w-none"
               />
 
               <div className="min-w-0 flex-1">
@@ -189,11 +197,11 @@ export function Testimonials() {
                 <blockquote className="mt-4 md:mt-6">
                   <p className="text-md font-semibold leading-[1.35]">
                     <span aria-hidden="true" className="text-ember">
-                      “
+                      «
                     </span>
                     {t.quote}
                     <span aria-hidden="true" className="text-ember">
-                      ”
+                      »
                     </span>
                   </p>
                 </blockquote>
@@ -203,16 +211,21 @@ export function Testimonials() {
         </motion.div>
       </div>
 
-      {/* Position */}
+      {/* Position. Counted in reviews, not in pages: the eyebrow promises
+          three of them, and a rule that read "01 / 02" left a reader looking
+          for the one that had apparently gone missing. */}
       <Rise delay={0.1} className="mt-12 flex items-center gap-5 md:mt-16 md:gap-8">
         <span className="label shrink-0 tabular-nums">
-          {pad(index + 1)} / {pad(pages)}
+          {perView > 1
+            ? `${pad(index + 1)}-${pad(index + perView)}`
+            : pad(index + 1)}{" "}
+          / {pad(count)}
         </span>
-        <span className="relative block h-px flex-1 bg-ink/15">
+        <span className="relative block h-px flex-1 bg-paper/20">
           <motion.span
             className="absolute inset-y-0 left-0 block bg-ember"
-            style={{ width: `${100 / pages}%` }}
-            animate={{ x: `${index * 100}%` }}
+            style={{ width: `${(perView / count) * 100}%` }}
+            animate={{ x: `${(index / perView) * 100}%` }}
             transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE }}
           />
         </span>

@@ -8,10 +8,13 @@ import type { CSSProperties, ReactNode } from "react";
  * there, so a made decision reads as ink filled with ember.
  */
 
-/** Rows bleed a little past the column so the ink fill has air around the type. */
+/**
+ * The ink fill bleeds past the column so the type has air inside it; the row
+ * itself does not, so every hairline lands on the same line as the step rule
+ * above the list.
+ */
 const PAD = "clamp(0.9rem, 1.6vw, 1.5rem)";
-export const ROW_PAD_CLASS = "px-[clamp(0.9rem,1.6vw,1.5rem)]";
-export const ROW_BLEED: CSSProperties = { marginInline: `calc(${PAD} * -1)` };
+const FILL_BLEED: CSSProperties = { insetInline: `calc(${PAD} * -1)` };
 
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
@@ -26,7 +29,7 @@ export function OptionRow({
   selected,
   onSelect,
 }: {
-  /** Small typewriter number on the left — chair, service index, position. */
+  /** Small typewriter number on the left: chair, service index, position. */
   index?: string;
   /** Optional thumbnail block. */
   media?: ReactNode;
@@ -46,13 +49,14 @@ export function OptionRow({
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        className={`group relative flex w-full items-center gap-[clamp(0.85rem,2vw,1.75rem)] py-[clamp(1.15rem,2.4vw,1.9rem)] text-left transition-colors duration-500 ${EASE_CLASS} ${ROW_PAD_CLASS} ${
+        className={`group relative flex w-full items-center gap-[clamp(0.85rem,2vw,1.75rem)] py-[clamp(1.15rem,2.4vw,1.9rem)] text-left transition-colors duration-500 ${EASE_CLASS} ${
           selected ? "text-ember" : "hover:text-ember focus-visible:text-ember"
         }`}
       >
         <span
           aria-hidden="true"
-          className={`absolute inset-0 origin-left bg-ink transition-transform duration-[600ms] ${EASE_CLASS} ${
+          style={FILL_BLEED}
+          className={`absolute inset-y-0 origin-left bg-ink transition-transform duration-[600ms] ${EASE_CLASS} ${
             selected
               ? "scale-x-100"
               : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"
@@ -60,7 +64,7 @@ export function OptionRow({
         />
 
         {index ? (
-          <span className="label relative z-10 w-[2.5ch] shrink-0 opacity-60">
+          <span className="label relative z-10 w-[2.5ch] shrink-0">
             {index}
           </span>
         ) : null}
@@ -74,10 +78,10 @@ export function OptionRow({
             {title}
           </span>
           {detail ? (
-            <span className="label mt-2 block opacity-65">{detail}</span>
+            <span className="label mt-2 block">{detail}</span>
           ) : null}
           {aside ? (
-            <span className="label mt-1 hidden opacity-45 md:block">{aside}</span>
+            <span className="label mt-1 hidden md:block">{aside}</span>
           ) : null}
         </span>
 
@@ -89,7 +93,7 @@ export function OptionRow({
               </span>
             ) : null}
             {valueNote ? (
-              <span className="label mt-2 block opacity-60">{valueNote}</span>
+              <span className="label mt-2 block">{valueNote}</span>
             ) : null}
           </span>
         ) : null}

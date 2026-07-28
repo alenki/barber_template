@@ -17,7 +17,7 @@ const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 /* The house voice, applied to being told off. Short, flat, never scolding. */
 const COMPLAINT: Record<FieldName, string> = {
   name: "Нам нужно имя, чтобы записать его на кресло.",
-  email: "В этом адресе чего-то не хватает — проверьте.",
+  email: "В этом адресе чего-то не хватает, проверьте.",
   phone: "Номер, по которому вас можно набрать: не меньше десяти цифр.",
 };
 
@@ -33,7 +33,7 @@ function validate(d: Details): Partial<Record<FieldName, string>> {
 
 /**
  * The only step that asks rather than offers. Real labels, real input types,
- * and complaints that are announced where they happen — nothing is validated
+ * and complaints that are announced where they happen; nothing is validated
  * until you have had a go at the whole thing.
  */
 export function DetailsForm({
@@ -217,7 +217,7 @@ function Field({
 
   return (
     <p className="m-0 mt-[clamp(1.75rem,3.5vw,2.75rem)] first:mt-0">
-      <label htmlFor={id} className="label block opacity-60">
+      <label htmlFor={id} className="label block">
         {label}
       </label>
 
@@ -231,9 +231,9 @@ function Field({
       })}
 
       {/* The complaint sits in a live region that is on the page from the
-          start — an alert added only when it fires often goes unannounced. */}
+          start; an alert added only when it fires often goes unannounced. */}
       <span id={messageId} className="label mt-2 block">
-        <span className={error ? "hidden" : "opacity-45"}>{hint}</span>
+        <span className={error ? "hidden" : "opacity-75"}>{hint}</span>
         <span role="alert" className="font-bold">
           {error ?? ""}
         </span>

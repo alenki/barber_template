@@ -10,12 +10,12 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 export const metadata: Metadata = {
   metadataBase: new URL("https://millimetr.ru"),
   title: {
-    default: `${shop.name} — барбершоп, ${shop.city}`,
-    template: `%s — ${shop.name}`,
+    default: `${shop.name} · барбершоп, ${shop.city}`,
+    template: `%s · ${shop.name}`,
   },
   description: shop.description,
   openGraph: {
-    title: `${shop.name} — барбершоп, ${shop.city}`,
+    title: `${shop.name} · барбершоп, ${shop.city}`,
     description: shop.description,
     type: "website",
     locale: "ru_RU",
@@ -45,6 +45,12 @@ export default function RootLayout({
     >
       <body>
         <MotionProvider>
+          <a
+            href="#main"
+            className="ui sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[70] focus:rounded-full focus:bg-ink focus:px-6 focus:py-3 focus:text-paper"
+          >
+            К содержимому
+          </a>
           <Header />
           <main id="main">{children}</main>
           <Footer />

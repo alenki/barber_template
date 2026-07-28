@@ -26,7 +26,7 @@ const PLACEMENT = [
 
 /* "Кресла" sets 2.487em wide in Playfair italic at the mega tracking, so these
    are the sizes that run it flush to both gutters on one line. The gutter is
-   itself clamped, which is why the ratio changes at md — below 500px it is a
+   itself clamped, which is why the ratio changes at md; below 500px it is a
    flat 1.25rem and the line would otherwise overrun a 375px screen. */
 const MEGA = "text-[clamp(3.25rem,35vw,40rem)] md:text-[clamp(10rem,36.8vw,44rem)]";
 
@@ -39,7 +39,7 @@ export function Chairs() {
     <section data-tone="ink" className="slab bg-paper text-ink">
       <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
         <span className="label">
-          Кресла {first} — {last}
+          Кресла {first}-{last}
         </span>
         <span
           className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
@@ -55,7 +55,7 @@ export function Chairs() {
         segments={[{ text: "Кресла" }]}
       />
 
-      <Rise className="mt-8 flex justify-end md:mt-12" delay={0.15}>
+      <Rise className="mt-8 flex md:mt-12 md:justify-end" delay={0.15}>
         <p className="note max-w-[30ch] text-ash md:text-right">
           {spellYears(years)} опыта, {count(barbers.length, "кресло", "кресла", "кресел")} и{" "}
           {count(locations.length, "зал", "зала", "залов")} {shop.cityIn}.

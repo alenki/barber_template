@@ -61,8 +61,9 @@ export function plural(n: number, one: string, few: string, many: string): strin
 }
 
 /** `count(5, "кресло", "кресла", "кресел")` → "5 кресел". */
+/* A no-break space: "5 кресел" split across two lines reads as a stray 5. */
 export const count = (n: number, one: string, few: string, many: string): string =>
-  `${n} ${plural(n, one, few, many)}`;
+  `${n}\u00a0${plural(n, one, few, many)}`;
 
 /**
  * Roubles, grouped the Russian way: a narrow no-break space every three
@@ -72,6 +73,10 @@ export const count = (n: number, one: string, few: string, many: string): string
  */
 export const money = (n: number) =>
   `${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽`;
+
+/** Russian writes a decimal with a comma: `decimal(5)` → "5,0". */
+export const decimal = (n: number, places = 1) =>
+  n.toFixed(places).replace(".", ",");
 
 /* The three nouns the site counts often enough to be worth naming once. */
 export const years = (n: number) => count(n, "год", "года", "лет");

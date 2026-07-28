@@ -24,7 +24,7 @@ export function Hero() {
         <Rise
           animateOnMount
           delay={1.25}
-          className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-2 md:mt-16 md:justify-between"
+          className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 md:mt-16 md:justify-between md:gap-x-10"
         >
           {hero.meta.map((m) => (
             <span key={m} className="label">

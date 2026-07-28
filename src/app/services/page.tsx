@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { services, combos, shop, type Service } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
@@ -6,7 +7,7 @@ import { Frame } from "@/components/motion/Frame";
 import { count, money, plural, spell } from "@/lib/words";
 
 /* ------------------------------------------------------------------
-   Derived locally — content.ts owns the words, this file owns the maths.
+   Derived locally: content.ts owns the words, this file owns the maths.
    Everything here is pure and deterministic: same output on the server
    and the client, no dates, no randomness.
    ------------------------------------------------------------------ */
@@ -22,7 +23,7 @@ const LONGEST = Math.max(...minutes);
 
 /**
  * Alt text for the six service photographs. content.ts carries the paths,
- * not the descriptions, so the descriptions live here — one real sentence
+ * not the descriptions, so the descriptions live here, one real sentence
  * per photograph, never "фото, на котором".
  */
 const ALT: Record<string, string> = {
@@ -50,7 +51,7 @@ const POLICIES = [
   {
     n: "01",
     title: "Отмена",
-    body: "Перенести или отменить бесплатно — не позже чем за шесть часов. Внутри шести часов или при неявке мы списываем половину стоимости услуги. Кресло держали для вас, и занять его не мог никто другой.",
+    body: "Перенести или отменить бесплатно можно не позже чем за шесть часов. Внутри шести часов или при неявке мы списываем половину стоимости услуги. Кресло держали для вас, и занять его не мог никто другой.",
   },
   {
     n: "02",
@@ -60,12 +61,12 @@ const POLICIES = [
   {
     n: "03",
     title: "Оплата",
-    body: "Карта, СБП или наличные. Оплатить онлайн заранее или рассчитаться в кресле — вы выбираете на последнем шаге. Чаевых никогда не ждут и всегда замечают.",
+    body: "Карта, СБП или наличные. Онлайн-запись ничего не списывает заранее: рассчитываетесь в кресле, когда всё готово. Чаевых никогда не ждут и всегда замечают.",
   },
   {
     n: "04",
     title: "Опоздание",
-    body: "После пятнадцати минут нам, возможно, придётся сократить услугу или перенести запись. Позвоните до того, как приедете. Пробки на Садовом — ничья вина.",
+    body: "После пятнадцати минут нам, возможно, придётся сократить услугу или перенести запись. Позвоните до того, как приедете. В пробках на Садовом никто не виноват.",
   },
 ] as const;
 
@@ -83,7 +84,7 @@ export const metadata: Metadata = {
     "комбинация",
     "комбинации",
     "комбинаций"
-  )}, от ${money(LOW)}. Стрижки, фейды, форма бороды и королевское бритьё — с длительностью и ценой каждой.`,
+  )}, от ${money(LOW)}. Стрижки, фейды, форма бороды и королевское бритьё, с длительностью и ценой каждой.`,
 };
 
 export default function ServicesPage() {
@@ -108,7 +109,7 @@ export default function ServicesPage() {
                   "услуг"
                 )}.`,
               },
-              { text: "Одна из них — ваша.", italic: true },
+              { text: "Одна из них ваша.", italic: true },
             ]}
           />
 
@@ -123,10 +124,10 @@ export default function ServicesPage() {
               {count(combos.length, "комбинация", "комбинации", "комбинаций")}
             </span>
             <span className="label whitespace-nowrap">
-              {money(LOW)} — {money(HIGH)}
+              {money(LOW)}-{money(HIGH)}
             </span>
             <span className="label">
-              {SHORTEST} — {LONGEST} минут
+              {SHORTEST}-{LONGEST} минут
             </span>
           </Rise>
 
@@ -144,7 +145,7 @@ export default function ServicesPage() {
       <section data-tone="ink" className="slab bg-paper text-ink">
         <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
           <span className="label">
-            {services[0].index} — {services[services.length - 1].index}
+            {services[0].index}-{services[services.length - 1].index}
           </span>
           <span
             className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
@@ -166,22 +167,31 @@ export default function ServicesPage() {
         <div className="edge py-[clamp(5rem,11vw,12rem)]">
           <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
             <span className="label">Комбинации</span>
-            <span className="label">{spell(combos.length, "f")} штуки</span>
+            <span className="label">
+              {count(combos.length, "вариант", "варианта", "вариантов")}
+            </span>
           </div>
 
           {/* "Вместе" measures 2.85em wide in Playfair italic at the mega
-              tracking. 30vw is the size that runs it gutter to gutter without
-              ever clipping — the binding case is 375px, where the 20px gutter
-              leaves 335px and the word draws 321. */}
-          <SplitText
-            as="h2"
-            className="mega mt-6 text-[clamp(3.25rem,30vw,36rem)] md:mt-10"
-            segments={[{ text: "Вместе" }]}
-          />
+              tracking, so the column's own inline size divided by 2.88 runs it
+              gutter to gutter at every width. `cqw` rather than `vw` because a
+              desktop scrollbar is part of `vw` and left the word 90px short. */}
+          <div
+            style={{ containerType: "inline-size" }}
+            className="mt-6 overflow-x-clip md:mt-10"
+          >
+            <div style={{ "--text-mega": "calc(100cqw / 2.88)" } as CSSProperties}>
+              <SplitText
+                as="h2"
+                className="mega block"
+                segments={[{ text: "Вместе" }]}
+              />
+            </div>
+          </div>
 
           <Rise delay={0.15} className="mt-10 flex md:mt-16 md:justify-end">
             <p className="note max-w-[32ch] md:text-right">
-              Две услуги, одна посадка, одна цена. Бронируются как одна запись —
+              Две услуги, одна посадка, одна цена. Бронируются как одна запись,
               так что никто никого не ждёт.
             </p>
           </Rise>
@@ -261,17 +271,20 @@ export default function ServicesPage() {
             ]}
           />
 
+          {/* Sticker on the left, like the one on the home page: the
+              bottom-right corner belongs to the Book pill, and two booking
+              circles stacked in it read as one broken control. */}
           <Rise
             delay={0.2}
             className="mt-12 flex items-center justify-between gap-6 md:mt-20"
           >
-            <span className="ui">Услуга, кресло, время</span>
             <span
               className="display flex size-[clamp(5.5rem,10vw,9rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.05rem,1.8vw,1.75rem)] text-ink italic transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-[14deg]"
               aria-hidden="true"
             >
               Запись
             </span>
+            <span className="ui text-right">Услуга, кресло, время</span>
           </Rise>
         </Link>
       </section>
@@ -284,7 +297,7 @@ export default function ServicesPage() {
 /**
  * One service, one generous row. Odd rows put the photograph on the left,
  * even rows on the right, so the eye zig-zags down the slab instead of
- * running a list. Both cells are pinned to row 1 explicitly — with only a
+ * running a list. Both cells are pinned to row 1 explicitly; with only a
  * column start, grid auto-placement would push the second cell down a row.
  */
 function ServiceRow({
@@ -320,7 +333,7 @@ function ServiceRow({
 
           {/* The blurb and the price share one 46ch measure. `ch` resolves
               against the font-size of the box it is written on, so the measure
-              is set once here — put it on both children and the two right
+              is set once here; put it on both children and the two right
               edges land in different places. */}
           <div className="mt-7 max-w-[46ch] text-md md:mt-10">
             <Rise delay={0.12}>

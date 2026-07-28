@@ -32,12 +32,12 @@ export function BookFaq() {
       {/* ---------------------------------------------------------- book */}
 
       <Rise className="edge flex items-baseline justify-between gap-6">
-        <span className="label text-paper/55">Запись</span>
+        <span className="label text-paper/70">Запись</span>
         {/* -my-3 py-3 keeps the optical position while giving the tap target
             the height it needs on a phone. */}
         <a
           href={shop.phoneHref}
-          className="label -my-3 inline-block py-3 text-paper/55 transition-colors duration-500 hover:text-paper"
+          className="label -my-3 inline-block py-3 text-paper/70 transition-colors duration-500 hover:text-paper"
         >
           {shop.phone}
         </a>
@@ -79,12 +79,12 @@ export function BookFaq() {
           className="md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9"
         >
           <p className="note max-w-[40ch] text-paper/70">
-            Запись онлайн занимает меньше минуты. Выберите зал, услугу и мастера
-            — или оставьте кресло на наше усмотрение.
+            Запись онлайн занимает меньше минуты. Выберите зал, услугу и
+            мастера, или оставьте кресло на наше усмотрение.
           </p>
           <p className="note mt-5 max-w-[40ch] text-paper/70">
-            Оплата сразу или в конце, как вам удобнее. Отмена бесплатна не позже
-            чем за шесть часов.
+            Ничего не списывается заранее, рассчитываетесь в кресле. Отмена
+            бесплатна не позже чем за шесть часов.
           </p>
         </Rise>
       </div>
@@ -97,14 +97,22 @@ export function BookFaq() {
               <p className="display text-[clamp(1.5rem,2.6vw,2.4rem)] italic">
                 {location.name}
               </p>
-              <div className="mt-4 grid grid-cols-[10ch_1fr] gap-x-3">
+              {/* The same table Locations draws, drawn the same way: hairline
+                  rows, day left, hour right. Two treatments of one object on
+                  one page read as two components. */}
+              <dl className="m-0 mt-5 border-b border-paper/20">
                 {location.hours.map((h) => (
-                  <div key={h.days} className="contents">
-                    <span className="label text-paper/45">{h.days}</span>
-                    <span className="label text-paper/70">{h.time}</span>
+                  <div
+                    key={h.days}
+                    className="flex items-baseline justify-between gap-4 border-t border-paper/20 py-2"
+                  >
+                    <dt className="label m-0 text-paper/70">{h.days}</dt>
+                    <dd className="label m-0 text-right tabular-nums">
+                      {h.time}
+                    </dd>
                   </div>
                 ))}
-              </div>
+              </dl>
             </Rise>
           ))}
         </div>
@@ -113,10 +121,14 @@ export function BookFaq() {
       {/* ----------------------------------------------------------- faq */}
 
       <div className="edge mt-[clamp(6rem,14vw,14rem)] md:grid md:grid-cols-12 md:gap-x-8">
-        <Rise className="md:col-span-3 md:self-start md:sticky md:top-28">
-          <p className="label text-paper/55">Вопросы</p>
-          <p className="note mt-6 max-w-[26ch] text-paper/45">
-            Если остались вопросы — напишите.
+        {/* Three of twelve is 200px at the tablet width, which breaks the email
+            address and the note across four lines apiece. */}
+        <Rise className="md:col-span-4 md:self-start md:sticky md:top-28 lg:col-span-3">
+          <p className="label text-paper/70">Вопросы</p>
+          {/* /45 measured 4.2:1 against the ink slab, under the floor for
+              type this small. /65 clears it without lifting off the page. */}
+          <p className="note mt-6 max-w-[26ch] text-paper/65">
+            Если остались вопросы, напишите.
           </p>
           <a
             href={`mailto:${shop.email}`}
@@ -126,7 +138,7 @@ export function BookFaq() {
           </a>
         </Rise>
 
-        <ul className="mt-10 border-t border-paper/20 md:col-span-9 md:mt-0">
+        <ul className="mt-10 border-t border-paper/20 md:col-span-8 md:mt-0 lg:col-span-9">
           {faqs.map((faq, i) => (
             <FaqRow
               key={faq.q}
@@ -195,7 +207,7 @@ function FaqRow({
         </button>
       </h3>
 
-      {/* The region carrying `id` stays mounted whether or not it is open —
+      {/* The region carrying `id` stays mounted whether or not it is open,
           `aria-controls` on the button has to resolve to something, and it
           pointed at nothing while collapsed. Only the animated inner panel
           comes and goes. */}

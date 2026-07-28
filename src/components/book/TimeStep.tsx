@@ -26,7 +26,7 @@ const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
  * The diary. Fourteen days built from a date captured in an effect upstairs,
  * and the free hours in each of them derived from the room's opening times in
  * content.ts and the length of the service. Nothing here is invented at
- * render time — the booked-out hours come from a hash of the day and the slot,
+ * render time; the booked-out hours come from a hash of the day and the slot,
  * so they are the same on every reload.
  */
 export function TimeStep({
@@ -50,7 +50,7 @@ export function TimeStep({
   const day = dayIndex >= 0 ? days[dayIndex] : null;
 
   /* The wall clock, read on the client only. Today's hours that have already
-     gone are dropped rather than offered — booking this morning at 23:05 is
+     gone are dropped rather than offered; booking this morning at 23:05 is
      not a thing the diary should allow. */
   const now = useSyncExternalStore(subscribeNever, nowSnapshot, serverSnapshot);
 
@@ -76,7 +76,7 @@ export function TimeStep({
 
   if (!days.length) {
     return (
-      <p className="label opacity-55">Открываем запись…</p>
+      <p className="label opacity-75">Открываем запись…</p>
     );
   }
 
@@ -91,7 +91,7 @@ export function TimeStep({
           Ближайшие {spell(days.length, "m").toLowerCase()}{" "}
           {plural(days.length, "день", "дня", "дней")}
         </span>
-        <span className="label opacity-55">{room.name}</span>
+        <span className="label opacity-75">{room.name}</span>
       </div>
 
       <ul className="m-0 mt-6 grid list-none grid-cols-4 gap-[6px] p-0 sm:grid-cols-5 md:mt-8 md:grid-cols-7">
@@ -118,13 +118,13 @@ export function TimeStep({
                       : "border-current/25 hover:border-ink hover:bg-ink hover:text-ember focus-visible:border-ink"
                 }`}
               >
-                <span className="label leading-none opacity-70">
+                <span className="label leading-none opacity-75">
                   {WEEKDAY[d.weekday]}
                 </span>
                 <span className="display text-[clamp(1.35rem,2.4vw,2rem)] leading-none">
                   {String(d.dayOfMonth).padStart(2, "0")}
                 </span>
-                <span className="label leading-none opacity-55">
+                <span className="label leading-none opacity-75">
                   {closed ? CLOSED : monthShort(d)}
                 </span>
                 {i === 0 ? <span className="sr-only">Сегодня</span> : null}
@@ -141,7 +141,7 @@ export function TimeStep({
             {day ? dayLabel(day) : "Выберите день"}
             {opening?.window ? ` · ${opening.time}` : ""}
           </span>
-          <span className="label opacity-55" role="status">
+          <span className="label opacity-75" role="status">
             {day
               ? free === 0
                 ? "Свободных часов нет"
@@ -151,7 +151,7 @@ export function TimeStep({
         </div>
 
         {slots.length === 0 ? (
-          <p className="note mt-6 max-w-[36ch] opacity-70">
+          <p className="note mt-6 max-w-[36ch] opacity-75">
             В этот день зал не работает. Выберите другой день или другой зал.
           </p>
         ) : (
@@ -180,8 +180,8 @@ export function TimeStep({
                     >
                       {clock(slot.start)}
                     </span>
-                    <span className="label leading-none opacity-60">
-                      {slot.taken ? "Занято" : `— ${clock(slot.end)}`}
+                    <span className="label leading-none opacity-75">
+                      {slot.taken ? "Занято" : `до ${clock(slot.end)}`}
                     </span>
                   </button>
                 </li>
