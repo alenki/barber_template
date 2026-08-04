@@ -2,28 +2,30 @@ import { ritual } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 
 /**
- * Where each step lands in the empty field: left, right, then left but deeper
- * in. Index-driven and fixed, so the scatter is identical on every render.
- */
-const ANCHOR = [
-  "md:mr-auto",
-  "md:ml-auto md:mr-[3%]",
-  "md:ml-[13%] md:mr-auto",
-] as const;
-
-/**
- * Ember slab. A giant roman/italic headline, then the three beats of a visit
- * (before, during, after) falling diagonally across the slab.
+ * Espresso slab. A giant roman/italic headline, then the three beats of a visit
+ * (before, during, after) measured off a rule.
  *
- * The numbering is not decoration: this is the only genuinely ordered content
- * on the site, and the order is what the section is about. Each beat sits
- * under its own hairline like everything else here, which is what keeps three
- * small objects in a very large field reading as a composition rather than as
- * three things that got lost.
+ * The beats used to fall diagonally across the slab — left, right, then left
+ * but deeper in — on the theory that a large empty field reads as a poster. It
+ * does, but only around large objects, and these are a 110px numeral and a 12px
+ * line of typewriter copy. On a wide monitor the section was most of a screen
+ * of nothing with three small things adrift in it, which is the one thing this
+ * design system's own layout rules tell you not to do.
+ *
+ * So they are measured instead. The rule is the shop's own name drawn out —
+ * Миллиметр, whose mark is six bars stepping from solid to hairline — and the
+ * beats stand on it at equal intervals like readings off a scale. The numbering
+ * was always the point here, this being the only content on the site that is
+ * genuinely a sequence; now the order is carried by the line rather than by
+ * three numerals hoping to be read in the right order.
+ *
+ * `gap-x-0` is load-bearing: each beat draws its own segment of rule, and only
+ * touching segments read as one line running the width of the slab. The copy
+ * carries its own right padding instead, so the columns still breathe.
  */
 export function Ritual() {
   return (
-    <section data-tone="ink" className="relative bg-ember text-ink">
+    <section data-tone="paper" className="relative lamp bg-espresso text-paper">
       <div className="edge pt-[clamp(5rem,11vw,12rem)] pb-[clamp(5rem,11vw,12rem)]">
         {/* Capped in em so it breaks after "Наш" at every viewport. */}
         <SplitText
@@ -32,32 +34,27 @@ export function Ritual() {
           segments={[{ text: "Наш" }, { text: "ритуал", italic: true }]}
         />
 
-        <ol className="m-0 mt-[clamp(3rem,8vw,7rem)] list-none p-0">
-          {ritual.map((step, i) => (
-            <li
-              key={step.n}
-              className={`w-full border-t border-current/20 pt-6 md:w-[min(34rem,48%)] md:pt-8 ${
-                i === 0 ? "" : "mt-[clamp(2.5rem,5vw,4.5rem)]"
-              } ${ANCHOR[i % ANCHOR.length]}`}
-            >
-              <div className="flex flex-col items-start md:flex-row md:items-end md:gap-[clamp(1.25rem,3vw,3rem)]">
-                {/* The numeral carries the section's scale; the note is the
-                    only small thing on the slab, so it hangs off the numeral's
-                    baseline rather than floating on its own. Stacked below md,
-                    where a numeral beside a 26ch column leaves neither room. */}
-                <SplitText
-                  as="div"
-                  className="display shrink-0 text-[clamp(5rem,15vw,11rem)] leading-[0.72] italic"
-                  segments={[{ text: step.n }]}
-                />
-                <Rise
-                  delay={0.18}
-                  y={16}
-                  className="mt-5 min-w-0 md:mt-0 md:pb-[0.35em]"
-                >
-                  <p className="note max-w-[26ch]">{step.text}</p>
-                </Rise>
-              </div>
+        <ol className="m-0 mt-[clamp(3.5rem,9vw,8rem)] grid list-none grid-cols-1 gap-y-[clamp(2.75rem,5vw,4rem)] p-0 md:grid-cols-3 md:gap-y-0">
+          {ritual.map((step) => (
+            <li key={step.n}>
+              {/* The numeral stands on the rule rather than beside the copy: it
+                  is the reading, and the line under it is the scale. */}
+              <SplitText
+                as="div"
+                className="display text-[clamp(4rem,8.5vw,12rem)] leading-[0.78] italic"
+                segments={[{ text: step.n }]}
+              />
+
+              <div
+                aria-hidden="true"
+                className="ruler mt-[clamp(1.25rem,2.5vw,2rem)]"
+              />
+
+              <Rise delay={0.18} y={16}>
+                <p className="note mt-[clamp(1.25rem,2.5vw,2rem)] max-w-[30ch] pr-[clamp(1.25rem,3vw,3rem)]">
+                  {step.text}
+                </p>
+              </Rise>
             </li>
           ))}
         </ol>

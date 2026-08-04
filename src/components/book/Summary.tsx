@@ -1,7 +1,6 @@
 "use client";
 
 import { money } from "./schedule";
-import { count } from "@/lib/words";
 
 export type SummaryRow = {
   key: string;
@@ -14,65 +13,49 @@ export type SummaryRow = {
 };
 
 /**
- * What has been chosen so far, and what it costs. A rail on the right at
- * desktop width; a single wrapped line under the progress on a phone.
- * Filled rows are buttons; the fastest way back to a decision you regret.
+ * What has been chosen so far. Only decisions that exist are drawn: an empty
+ * rail is nothing at all rather than five captions against five dots. Rows
+ * already behind you are buttons; the fastest way back to a choice you regret.
  */
 export function SummaryRail({
   rows,
   total,
-  minutes,
   currentStep,
   onJump,
 }: {
   rows: SummaryRow[];
   total: number | null;
-  minutes: number | null;
   currentStep: number;
   onJump: (step: number) => void;
 }) {
+  const filled = rows.filter((r) => r.value !== null);
+  if (filled.length === 0) return null;
+
   return (
     <aside
       aria-label="Ваша запись"
       className="hidden md:col-span-4 md:col-start-9 md:block"
     >
-      <div className="sticky top-[clamp(6rem,11vh,8rem)] border-t border-current/20 pt-4">
-        <p className="label">Пока что</p>
-
-        <ul className="m-0 mt-7 list-none p-0">
-          {rows.map((row) => {
-            const value = row.value;
-            /* A decision already made and already behind you is a way back. */
-            const jumpable = value !== null && row.step < currentStep;
+      <div className="sticky top-[clamp(6rem,11vh,8rem)]">
+        <ul className="m-0 list-none p-0">
+          {filled.map((row) => {
+            const value = row.value as string;
+            const jumpable = row.step < currentStep;
 
             return (
-              <li key={row.key} className="border-b border-current/15">
+              <li key={row.key}>
                 {jumpable ? (
                   <button
                     type="button"
                     onClick={() => onJump(row.step)}
                     aria-label={`Изменить: ${row.label.toLowerCase()}, сейчас ${value}`}
-                    className="flex w-full items-baseline justify-between gap-4 py-3 text-left transition-opacity duration-500 hover:opacity-55"
+                    className="flex w-full items-baseline justify-between gap-4 py-2 text-left transition-opacity duration-500 hover:opacity-55"
                   >
                     <RowText label={row.label} value={value} />
                   </button>
                 ) : (
-                  <div className="flex items-baseline justify-between gap-4 py-3">
-                    {value !== null ? (
-                      <RowText label={row.label} value={value} />
-                    ) : (
-                      <>
-                        {/* 40% ink on ember measured 2.21:1, a real label,
-                            not decoration, so it has to clear 4.5:1. */}
-                        <span className="label shrink-0 opacity-75">
-                          {row.label}
-                        </span>
-                        <span className="label opacity-40" aria-hidden="true">
-                          ·
-                        </span>
-                        <span className="sr-only">Ещё не выбрано</span>
-                      </>
-                    )}
+                  <div className="flex items-baseline justify-between gap-4 py-2">
+                    <RowText label={row.label} value={value} />
                   </div>
                 )}
               </li>
@@ -80,17 +63,14 @@ export function SummaryRail({
           })}
         </ul>
 
-        <div className="mt-8 flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
-          <span className="label">Итого</span>
-          <span className="display text-[clamp(1.35rem,2.2vw,2rem)] leading-none whitespace-nowrap italic">
-            {total === null ? "·" : money(total)}
-          </span>
-        </div>
-        <p className="label mt-2 text-right opacity-75">
-          {minutes === null
-            ? "Ничего не выбрано"
-            : `${count(minutes, "минута", "минуты", "минут")} в кресле`}
-        </p>
+        {total !== null && (
+          <div className="mt-6 flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
+            <span className="label">Итого</span>
+            <span className="display text-[clamp(1.35rem,2.2vw,2rem)] leading-none whitespace-nowrap italic">
+              {money(total)}
+            </span>
+          </div>
+        )}
       </div>
     </aside>
   );
@@ -116,25 +96,18 @@ export function SummaryBar({
   total: number | null;
 }) {
   const filled = rows.filter((r) => r.value);
+  if (filled.length === 0) return null;
 
   /* A <section>, not a <div>; `aria-label` is prohibited on the implicit
      generic role, so on a phone this running summary had no name at all. */
   return (
-    <section
-      aria-label="Ваша запись"
-      className="mt-6 border-t border-current/20 pt-3 md:hidden"
-    >
+    <section aria-label="Ваша запись" className="mt-5 md:hidden">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="label opacity-75">Пока что</span>
-        {filled.length === 0 ? (
-          <span className="label opacity-75">Пока пусто</span>
-        ) : (
-          filled.map((row) => (
-            <span key={row.key} className="label">
-              <span aria-hidden="true" className="opacity-45">/</span> {row.value}
-            </span>
-          ))
-        )}
+        {filled.map((row) => (
+          <span key={row.key} className="label">
+            {row.value}
+          </span>
+        ))}
         {total === null ? null : (
           <span className="label ml-auto whitespace-nowrap">{money(total)}</span>
         )}

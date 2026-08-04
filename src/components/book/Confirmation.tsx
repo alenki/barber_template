@@ -5,7 +5,7 @@ import Link from "next/link";
 import { shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-import { clock, duration, money } from "./schedule";
+import { clock, money } from "./schedule";
 import type { Details } from "./DetailsForm";
 
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
@@ -41,38 +41,26 @@ export function Confirmation({
   booking: Booking;
   onRestart: () => void;
 }) {
-  const slotWindow = `${clock(booking.start)}-${clock(
-    booking.start + booking.minutes
-  )}`;
-
+  /**
+   * Six lines, not ten. The email and telephone number were typed thirty
+   * seconds ago on the screen before this one, and reciting them back is not
+   * confirmation, it is filler.
+   */
   const lines: { label: string; value: string }[] = [
-    { label: "Зал", value: booking.room },
-    { label: "Адрес", value: booking.roomAddress },
     { label: "Услуга", value: booking.service },
     { label: "Кресло", value: booking.chair },
-    { label: "День", value: booking.dateLabel },
-    { label: "Время", value: slotWindow },
+    {
+      label: "Когда",
+      value: `${booking.dateLabel}, ${clock(booking.start)}`,
+    },
+    { label: "Зал", value: booking.room },
+    { label: "Адрес", value: booking.roomAddress },
     { label: "Имя", value: booking.details.name },
-    { label: "Почта", value: booking.details.email },
-    { label: "Телефон", value: booking.details.phone },
   ];
-
-  if (booking.details.note) {
-    lines.push({ label: "Комментарий", value: booking.details.note });
-  }
 
   return (
     <div>
-      <Rise animateOnMount className="border-t border-current/20 pt-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <span className="label">Бронь {booking.reference}</span>
-          <span className="label opacity-75">
-            {booking.dateLabel} · {clock(booking.start)}
-          </span>
-        </div>
-      </Rise>
-
-      <div className="mt-[clamp(1.5rem,3vw,2.5rem)]" style={MEGA_CONTAINER}>
+      <div style={MEGA_CONTAINER}>
         <div style={MEGA_FIT}>
           <SplitText
             as="h2"
@@ -91,14 +79,12 @@ export function Confirmation({
           <dl className="m-0 grid grid-cols-[7.5rem_1fr] gap-0 sm:grid-cols-[10rem_1fr]">
             {lines.map((line) => (
               <div key={line.label} className="contents">
-                <dt className="label border-t border-current/15 py-4 opacity-75">
-                  {line.label}
-                </dt>
-                {/* min-w-0 + break-words: a long unbroken email sets the
+                <dt className="label py-3 opacity-75">{line.label}</dt>
+                {/* min-w-0 + break-words: a long unbroken value sets the
                     1fr track's min-content width and pushed the whole grid
                     16px past a 375px viewport, where body{overflow-x:hidden}
                     then made the text unrecoverable. */}
-                <dd className="m-0 min-w-0 border-t border-current/15 py-4">
+                <dd className="m-0 min-w-0 py-3">
                   <span className="display block [overflow-wrap:anywhere] text-[clamp(1.05rem,1.7vw,1.5rem)] leading-tight italic">
                     {line.value}
                   </span>
@@ -107,25 +93,12 @@ export function Confirmation({
             ))}
           </dl>
 
-          <div className="mt-[clamp(2rem,4vw,3rem)] flex items-end justify-between gap-6 border-t border-current/20 pt-5">
-            <div>
-              <span className="label opacity-75">Итого</span>
-              <span className="display mt-2 block text-[clamp(2.25rem,5vw,4rem)] leading-none whitespace-nowrap">
-                {money(booking.price)}
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="label opacity-75">В кресле</span>
-              <span className="display mt-2 block text-[clamp(1.35rem,2.4vw,2rem)] leading-none italic">
-                {duration(booking.minutes)}
-              </span>
-            </div>
+          <div className="mt-[clamp(2rem,4vw,3rem)] flex items-baseline justify-between gap-6 border-t border-current/20 pt-5">
+            <span className="label opacity-75">Итого</span>
+            <span className="display text-[clamp(2rem,4.5vw,3.5rem)] leading-none whitespace-nowrap">
+              {money(booking.price)}
+            </span>
           </div>
-
-          <p className="label mt-4 opacity-75">
-            Сейчас ничего не списано. Рассчитаетесь в кресле картой или
-            наличными.
-          </p>
         </Rise>
 
         {/* -------------------------------------------------- the sticker */}
@@ -134,22 +107,16 @@ export function Confirmation({
           delay={0.28}
           className="md:col-span-4 md:col-start-9"
         >
-          <div className="flex size-[clamp(11rem,20vw,16rem)] flex-col items-center justify-center gap-2 rounded-full bg-ink text-ember">
+          <div className="flex size-[clamp(11rem,20vw,16rem)] flex-col items-center justify-center gap-2 rounded-full bg-brass text-ink">
             <span className="label opacity-75">Номер брони</span>
             <span className="display text-[clamp(1.25rem,2.4vw,2rem)] italic">
               {booking.reference}
             </span>
           </div>
 
-          <p className="note mt-[clamp(2rem,4vw,3rem)] max-w-[34ch] opacity-75">
-            Назовите его, если нужно перенести время. Бесплатно не позже чем за
-            шесть часов; внутри этого срока кресло держали для вас, и занять его
-            не мог никто другой.
-          </p>
-
           <a
             href={shop.phoneHref}
-            className="ui mt-6 inline-block border-b border-current/30 pb-1 transition-opacity duration-500 hover:opacity-60"
+            className="ui mt-[clamp(2rem,4vw,3rem)] inline-block border-b border-current/30 pb-1 transition-opacity duration-500 hover:opacity-60"
           >
             {shop.phone}
           </a>
@@ -177,17 +144,16 @@ export function Confirmation({
         className="mt-[clamp(2.5rem,5vw,4rem)] border-t border-current/20 pt-5"
       >
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
-          <p className="note max-w-[48ch] opacity-75">
-            Эта форма записи демонстрационная. Запись не создана, письмо не
-            отправлено и ничего не списано: данные выше существуют только в этой
-            вкладке браузера. Барбершоп «{shop.name}» {shop.cityIn} вымышленный.
+          <p className="note max-w-[44ch] opacity-75">
+            Это демонстрация: запись не создана, барбершоп «{shop.name}»
+            вымышленный.
           </p>
 
           <div className="flex shrink-0 flex-wrap items-center gap-8">
             <button
               type="button"
               onClick={onRestart}
-              className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-opacity duration-500 hover:opacity-60"
+              className="ui tap-reach group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-opacity duration-500 hover:opacity-60"
             >
               Записаться ещё
               <span

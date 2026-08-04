@@ -21,17 +21,21 @@ export const display = Playfair({
 
 /**
  * Typewriter: IBM Plex Mono. Small uppercase copy, labels, running text in
- * the margins. Same 400/700 roman-and-italic palette Courier Prime gave the
- * Latin build, with Cyrillic drawn to match.
+ * the margins.
  *
  * Cousine is the closer Courier match and was the first choice, but it has no
  * ₽, so every price in a `.label` fell back to Arial for one glyph. Plex carries
  * it, which on a site quoting roubles in the margins is the deciding vote.
+ *
+ * Regular roman only. The Latin build declared 400/700 × roman/italic out of
+ * habit and never set a single word in three of them; with a Cyrillic subset
+ * added those three unused files cost more than they did in Latin, and every
+ * one of them was being fetched.
  */
 export const typewriter = IBM_Plex_Mono({
   subsets: ["cyrillic", "latin"],
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
+  weight: ["400"],
+  style: ["normal"],
   display: "swap",
   variable: "--font-typewriter",
 });

@@ -71,13 +71,12 @@ export default async function JournalPostPage({
 
   return (
     <>
-      {/* ---------------- Ember: the masthead ---------------- */}
-      <section data-tone="ink" className="relative bg-ember text-ink">
+      {/* ---------------- Espresso: the masthead ---------------- */}
+      <section data-tone="paper" className="relative lamp bg-espresso text-paper">
         <div className="edge pt-[28svh] pb-[clamp(2.5rem,6vw,5rem)]">
-          <Rise className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4">
+          <Rise className="flex flex-wrap items-baseline gap-x-6 border-t border-current/20 pt-4">
             <span className="label">{post.category}</span>
-            <span className="label">{post.date}</span>
-            <span className="label">{post.readMinutes} мин чтения</span>
+            <span className="label opacity-70">{post.date}</span>
           </Rise>
 
           {/* Roman, not italic. This headline is being read, not looked at. */}
@@ -91,11 +90,11 @@ export default async function JournalPostPage({
       </section>
 
       {/* ---------------- The photograph, straddling the two slabs ----------------
-          Top half of this band is ember, bottom half is paper, so the frame
+          Top half of this band is espresso, bottom half is paper, so the frame
           sits across the seam without either slab having to know about it.
           Both halves are light, so the header stays `ink` throughout. */}
       <div data-tone="ink" className="edge relative">
-        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1/2 bg-ember" />
+        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1/2 bg-espresso" />
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-paper" />
         <Frame
           src={post.image}
@@ -116,10 +115,9 @@ export default async function JournalPostPage({
         {/* `ch` resolves against the element's own font-size, so the measure
             is set at the size the prose is actually read at. */}
         <div className="mx-auto max-w-[62ch] text-[1.15rem]">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4">
-            <span className="label">Текст: {author.name}</span>
-            <span className="label text-ash">
-              Кресло {author.chair} · {author.role}
+          <div className="border-t border-current/20 pt-4">
+            <span className="label">
+              Текст: {author.name}, кресло {author.chair}
             </span>
           </div>
 
@@ -139,18 +137,11 @@ export default async function JournalPostPage({
               ))}
             </article>
           </Rise>
-
-          <div className="mt-12 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-1 border-t border-current/20 pt-4 md:mt-16">
-            <span className="label">{post.category}</span>
-            <span className="label text-ash">
-              {shop.name} · {shop.city}, {shop.country}
-            </span>
-          </div>
         </div>
       </section>
 
-      {/* ---------------- Ember: the other two ---------------- */}
-      <section data-tone="ink" className="slab bg-ember text-ink">
+      {/* ---------------- Espresso: the other two ---------------- */}
+      <section data-tone="paper" className="slab lamp bg-espresso text-paper">
         <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-t border-current/20 pt-4">
           <h2 className="label">Ещё из журнала</h2>
           <Link
@@ -178,14 +169,7 @@ export default async function JournalPostPage({
                     objectPosition="center 45%"
                   />
 
-                  <div className="mt-6 flex items-center gap-3">
-                    <span className="label">{other.category}</span>
-                    <span
-                      aria-hidden="true"
-                      className="inline-block size-[5px] shrink-0 rounded-full bg-ink"
-                    />
-                    <span className="label">{other.readMinutes} мин чтения</span>
-                  </div>
+                  <p className="label mt-6">{other.category}</p>
 
                   <h3 className="display relative mt-4 max-w-[18ch] pb-3 text-lg italic">
                     {other.title}

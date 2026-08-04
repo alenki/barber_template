@@ -15,6 +15,15 @@ const SOCIAL = [
 ] as const;
 
 /**
+ * Shared by both link columns so the two answer identically — they read as one
+ * block of navigation across a gap, and a difference between them would show.
+ * `w-fit` so the box is the word: at full column width the target would start
+ * a screen-width away from the type it belongs to.
+ */
+const LINK =
+  "ui tap w-fit origin-left transition-transform duration-300 ease-out-expo hover:scale-[1.08] focus-visible:scale-[1.08]";
+
+/**
  * Full-bleed photograph, links laid over it, and the closing line
  * sitting on the bottom edge at the largest size on the site.
  *
@@ -42,34 +51,55 @@ export function Footer() {
             {shop.name} · {shop.city}, {shop.country}
           </p>
           {/* Contact is data, not display: it stays in the UI face and is
-              never allowed to break a phone number across two lines. */}
-          <a
-            href={`mailto:${shop.email}`}
-            className="mt-4 -my-1 block w-fit py-1 text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-ember hover:underline"
-          >
-            {shop.email}
-          </a>
-          <a
-            href={shop.phoneHref}
-            className="-my-1 block w-fit py-1 text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-ember hover:underline"
-          >
-            {shop.phone}
-          </a>
+              never allowed to break a phone number across two lines.
+
+              The column is the point. `tap` sets `display: inline-flex` to hold
+              the 44px floor, which left both links on one line running into
+              each other — «privet@millimetr.ru+7 (495) 123-45-67» — because
+              `w-fit` and a top margin do nothing to an inline box. Making the
+              wrapper the flex container puts them back on their own lines and
+              keeps the tap targets; `items-start` is what stops each link
+              stretching its underline to the full column. */}
+          <div className="mt-3 flex flex-col items-start">
+            <a
+              href={`mailto:${shop.email}`}
+              className="tap text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-brass hover:underline"
+            >
+              {shop.email}
+            </a>
+            <a
+              href={shop.phoneHref}
+              className="tap text-[clamp(1.1rem,1.9vw,1.6rem)] leading-[1.25] whitespace-nowrap underline-offset-[6px] transition-colors duration-500 hover:text-brass hover:underline"
+            >
+              {shop.phone}
+            </a>
+          </div>
         </div>
 
-        <nav className="flex flex-col gap-1">
+        {/* Both columns are set in the 13px UI face, so on a phone every one of
+            these was a 31px-tall target stacked 4px from the next one — the
+            single densest patch of mistappable links on the site. `tap` takes
+            each to the 44px floor, which also opens the rhythm of the column
+            enough that the gap between them can come out.
+
+            Hover is a step forward rather than the half-second fade to brass
+            these used to do: over a photograph a small type colour change is
+            most of a second of nothing much, where a scale answers on contact.
+            `origin-left` is what keeps the word growing off its own left edge
+            instead of drifting away from the column it is set in. */}
+        <nav className="flex flex-col">
           {[...nav, { label: BOOK_LABEL, href: "/book" }].map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="ui w-fit py-1.5 transition-colors duration-500 hover:text-ember"
+              className={LINK}
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col">
           {SOCIAL.map((s) => (
             <a
               key={s.label}
@@ -79,7 +109,7 @@ export function Footer() {
               /* min-w: "VK" is two letters and would otherwise be a 19px-wide
                  target. Nothing is drawn around it, so the extra hit area is
                  invisible. */
-              className="ui w-fit min-w-12 py-1.5 transition-colors duration-500 hover:text-ember"
+              className={`${LINK} min-w-12`}
             >
               {s.label}
             </a>
@@ -110,7 +140,9 @@ export function Footer() {
         {/* The Book pill owns the bottom-right corner of every screen, so the
             legal line runs left-to-right out of that corner rather than into
             it, and keeps a pill's worth of clearance underneath. */}
-        <div className="edge mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 pb-28 md:pb-14">
+        {/* pb clears the Book pill, which owns this corner; the inset is added
+            on top so the last line is not tucked behind the home indicator. */}
+        <div className="edge mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-[calc(3.5rem+env(safe-area-inset-bottom))]">
           <p className="label text-paper/65">
             © {shop.founded}-{YEAR} {shop.name}. Все права защищены.
           </p>

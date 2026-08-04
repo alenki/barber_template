@@ -4,7 +4,7 @@ import Link from "next/link";
 import { posts, shop, type Post } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-import { count, plural, spellNone } from "@/lib/words";
+import { count } from "@/lib/words";
 
 /* ------------------------------------------------------------------
    content.ts owns the words and the image paths. What it does not carry
@@ -21,8 +21,6 @@ const CATEGORY_LINE = CATEGORIES.map((c) => c.toLowerCase()).join(", ");
 
 /** The newest entry runs full width; everything behind it sits two-up. */
 const [lead, ...rest] = posts;
-
-const index = (i: number) => String(i + 1).padStart(2, "0");
 
 export const metadata: Metadata = {
   title: "Журнал",
@@ -42,22 +40,22 @@ export const metadata: Metadata = {
 export default function JournalPage() {
   return (
     <>
-      {/* ---------------- Ember: one word, dropped a third of a screen ---------------- */}
-      <section data-tone="ink" className="relative bg-ember text-ink">
+      {/* ---------------- Espresso: one word, dropped a third of a screen ---------------- */}
+      <section data-tone="paper" className="relative lamp bg-espresso text-paper">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
           <Rise className="border-t border-current/20 pt-4">
             <p className="label">Заметки из кресла</p>
           </Rise>
 
-          {/* "Журнал" measures 2.87em wide in Playfair italic at the mega
-              tracking, so the column's own inline size divided by 2.90 runs it
+          {/* "Журнал" measures 3.01em wide in Playfair italic at the mega
+              tracking, so the column's own inline size divided by 3.04 runs it
               gutter to gutter at every width. `cqw` rather than `vw` because a
               desktop scrollbar is part of `vw` and left the word 90px short. */}
           <div
             style={{ containerType: "inline-size" }}
             className="mt-[clamp(1.5rem,3vw,2.5rem)] overflow-x-clip"
           >
-            <div style={{ "--text-mega": "calc(100cqw / 2.90)" } as CSSProperties}>
+            <div style={{ "--text-mega": "calc(100cqw / 3.04)" } as CSSProperties}>
               <SplitText
                 as="h1"
                 delay={0.1}
@@ -68,6 +66,9 @@ export default function JournalPage() {
             </div>
           </div>
 
+          {/* One sentence. The strip of counts under it named the categories
+              each post already carries and totted up minutes nobody reads as
+              a sum. */}
           <Rise delay={0.28} className="mt-[clamp(3rem,9vw,7rem)] flex md:justify-end">
             {/* `.note`, not `.label`: this is running copy, and DESIGN.md keeps
                 `.label` for eyebrows, meta and captions. */}
@@ -76,44 +77,17 @@ export default function JournalPage() {
               рассказать это как следует.
             </p>
           </Rise>
-
-          <Rise
-            delay={0.36}
-            className="mt-[clamp(3rem,8vw,6rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
-          >
-            <span className="label">
-              {spellNone(posts.length, "f")}{" "}
-              {plural(posts.length, "запись", "записи", "записей")}
-            </span>
-            <span className="label">{CATEGORIES.join(" · ")}</span>
-            <span className="label">{TOTAL_MINUTES} минут в сумме</span>
-          </Rise>
         </div>
       </section>
 
       {/* ---------------- Paper: the lead, then the rest two-up ---------------- */}
       <section data-tone="ink" className="slab bg-paper text-ink">
-        <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
-          <span className="label">Сначала новое</span>
-          <span
-            className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
-            aria-hidden="true"
-          >
-            {posts.length}
-          </span>
-        </div>
-
         {/* ---- the lead ---- */}
-        <article className="mt-14 md:mt-24">
+        <article>
           <Link
             href={`/journal/${lead.slug}`}
             className="group block rounded-[10px]"
           >
-            <div className="flex items-baseline justify-between gap-6">
-              <span className="label">{index(0)}</span>
-              <span className="label text-ash">{lead.date}</span>
-            </div>
-
             <Frame
               src={lead.image}
               alt={lead.imageAlt}
@@ -122,7 +96,7 @@ export default function JournalPage() {
               parallax={7}
               /* 21:9 across a 350px column is a 150px letterbox, shorter than
                  the two posts underneath it, which is backwards for the lead. */
-              className="mt-6 aspect-[16/9] w-full md:mt-8 md:aspect-[21/9]"
+              className="aspect-[16/9] w-full md:aspect-[21/9]"
               objectPosition="center 45%"
             />
 
@@ -143,9 +117,6 @@ export default function JournalPage() {
                 <p className="max-w-[40ch] text-[1rem] leading-[1.65] text-ash">
                   {lead.excerpt}
                 </p>
-                <span className="ui mt-7 inline-block underline underline-offset-[6px]">
-                  Читать целиком
-                </span>
               </div>
             </div>
           </Link>
@@ -160,17 +131,12 @@ export default function JournalPage() {
                   href={`/journal/${post.slug}`}
                   className="group block rounded-[10px]"
                 >
-                  <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
-                    <span className="label">{index(i + 1)}</span>
-                    <span className="label text-ash">{post.date}</span>
-                  </div>
-
                   <Frame
                     src={post.image}
                     alt={post.imageAlt}
                     sizes="(min-width: 768px) 44vw, 100vw"
                     parallax={6}
-                    className="mt-6 aspect-[3/2] w-full md:mt-8 md:aspect-[4/5]"
+                    className="aspect-[3/2] w-full md:aspect-[4/5]"
                     objectPosition="center 45%"
                   />
 
@@ -188,23 +154,12 @@ export default function JournalPage() {
                     <p className="mt-5 max-w-[38ch] text-[0.95rem] leading-[1.65] text-ash">
                       {post.excerpt}
                     </p>
-
-                    <span className="ui mt-6 inline-block underline underline-offset-[6px]">
-                      Читать
-                    </span>
                   </div>
                 </Link>
               </Rise>
             </li>
           ))}
         </ul>
-
-        <Rise className="mt-20 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-t border-current/20 pt-4 md:mt-32">
-          <span className="label">Написано в зале</span>
-          <span className="label text-ash">
-            Каждую запись писал тот, кто держал машинку
-          </span>
-        </Rise>
       </section>
     </>
   );
@@ -212,16 +167,16 @@ export default function JournalPage() {
 
 /* ------------------------------------------------------------------ */
 
-/** Category and read time, held apart by a small ember dot. */
+/**
+ * Category and date. The read time went with the index numeral and the brass
+ * dot that used to hold them apart: three numbers around a headline is a
+ * dashboard, not a journal.
+ */
 function Meta({ post }: { post: Post }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-baseline gap-x-4">
       <span className="label">{post.category}</span>
-      <span
-        aria-hidden="true"
-        className="inline-block size-[5px] shrink-0 rounded-full bg-ember"
-      />
-      <span className="label">{post.readMinutes} мин чтения</span>
+      <span className="label text-ash">{post.date}</span>
     </div>
   );
 }

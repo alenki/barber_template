@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { barbers, locations, shop, type Barber } from "@/lib/content";
-import { SplitText, Rise } from "@/components/motion/SplitText";
+import { barbers, shop, type Barber } from "@/lib/content";
+import { SplitText } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-import { count, years as spellYears } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -24,43 +23,25 @@ const PLACEMENT = [
   "md:col-start-3 md:col-span-5",
 ];
 
-/* "Кресла" sets 2.487em wide in Playfair italic at the mega tracking, so these
+/* "Кресла" sets 2.625em wide in Playfair italic at the mega tracking, so these
    are the sizes that run it flush to both gutters on one line. The gutter is
    itself clamped, which is why the ratio changes at md; below 500px it is a
-   flat 1.25rem and the line would otherwise overrun a 375px screen. */
-const MEGA = "text-[clamp(3.25rem,35vw,40rem)] md:text-[clamp(10rem,36.8vw,44rem)]";
+   flat 1.25rem and the line would otherwise overrun a 375px screen.
+   Every term is the Latin-era number scaled by 2.487/2.625 — the word got
+   wider when `.mega` loosened for Cyrillic, so the type size has to come down
+   by the same factor to keep drawing the same line. */
+const MEGA = "text-[clamp(3.08rem,33.15vw,37.9rem)] md:text-[clamp(9.47rem,34.85vw,41.7rem)]";
 
 export function Chairs() {
-  const years = barbers.reduce((total, b) => total + b.years, 0);
-  const first = barbers[0].chair;
-  const last = barbers[barbers.length - 1].chair;
-
   return (
     <section data-tone="ink" className="slab bg-paper text-ink">
-      <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
-        <span className="label">
-          Кресла {first}-{last}
-        </span>
-        <span
-          className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
-          aria-hidden="true"
-        >
-          {barbers.length}
-        </span>
-      </div>
-
+      {/* The word carries the section. The eyebrow, the count badge and the
+          line of statistics under it were three captions on one noun. */}
       <SplitText
         as="h2"
-        className={`mega ${MEGA} mt-6 md:mt-10`}
+        className={`mega ${MEGA}`}
         segments={[{ text: "Кресла" }]}
       />
-
-      <Rise className="mt-8 flex md:mt-12 md:justify-end" delay={0.15}>
-        <p className="note max-w-[30ch] text-ash md:text-right">
-          {spellYears(years)} опыта, {count(barbers.length, "кресло", "кресла", "кресел")} и{" "}
-          {count(locations.length, "зал", "зала", "залов")} {shop.cityIn}.
-        </p>
-      </Rise>
 
       <div className="mt-20 grid grid-cols-1 gap-x-6 gap-y-20 md:mt-28 md:grid-cols-12 md:gap-y-20 lg:gap-x-8">
         {barbers.map((barber, i) => (
@@ -92,9 +73,8 @@ function Chair({ barber, place }: { barber: Barber; place: string }) {
         onBlur={() => setOpen(false)}
         className="block rounded-[10px]"
       >
-        <div className="flex items-baseline justify-between gap-4 border-t border-current/20 pt-3 pb-4">
+        <div className="border-t border-current/20 pt-3 pb-4">
           <span className="label">Кресло {barber.chair}</span>
-          <span className="label text-ash">{spellYears(barber.years)}</span>
         </div>
 
         <div className="relative overflow-hidden rounded-[10px]">
@@ -120,25 +100,17 @@ function Chair({ barber, place }: { barber: Barber; place: string }) {
             transition={{ duration: 0.8, ease: EASE }}
             className="absolute inset-x-0 bottom-0 z-10 min-h-[34%] bg-ink px-5 pt-5 pb-6 text-paper"
           >
+            {/* The bio, and nothing under it. The pills of specialities were
+                the same three words the bio had already said in sentences. */}
             <p className="font-typewriter text-[0.78rem] leading-[1.6] tracking-[0.02em]">
               {barber.bio}
             </p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {barber.specialties.map((s) => (
-                <li
-                  key={s}
-                  className="label rounded-full border border-paper/30 px-3 py-1"
-                >
-                  {s}
-                </li>
-              ))}
-            </ul>
           </motion.div>
         </div>
 
         <h3 className="display mt-5 text-lg italic">
           {barber.name}
-          <span className="ml-3 inline-flex size-[1.75rem] items-center justify-center rounded-full bg-ember align-middle text-ink not-italic md:size-[2rem]">
+          <span className="ml-3 inline-flex size-[1.75rem] items-center justify-center rounded-full bg-brass align-middle text-ink not-italic md:size-[2rem]">
             <motion.span
               variants={{ rest: { rotate: 0 }, open: { rotate: 45 } }}
               transition={{ duration: 0.7, ease: EASE }}
@@ -149,8 +121,6 @@ function Chair({ barber, place }: { barber: Barber; place: string }) {
             </motion.span>
           </span>
         </h3>
-
-        <p className="label mt-2 text-ash">{barber.role}</p>
       </Link>
     </motion.div>
   );

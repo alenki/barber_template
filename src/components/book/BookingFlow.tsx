@@ -10,6 +10,7 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
+import { useLenis } from "lenis/react";
 import Image from "next/image";
 import { barbers, locations, services, shop } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
@@ -23,7 +24,6 @@ import {
   buildDays,
   clock,
   dayLabel,
-  DAY_COUNT,
   referenceCode,
   serverSnapshot,
   spell,
@@ -31,7 +31,7 @@ import {
   todaySnapshot,
   type Day,
 } from "./schedule";
-import { count, money, plural, years as spellYears } from "@/lib/words";
+import { money, plural } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
@@ -44,6 +44,13 @@ const DONE = STEP_COUNT + 1;
    content.ts owns the shop; this file owns the questions it asks.
    ------------------------------------------------------------------ */
 
+/**
+ * Each step asks one question and says nothing else. The paragraph of
+ * typewriter copy that used to sit under every one of these was answering
+ * questions nobody had reached yet; the ones worth keeping are in the FAQ on
+ * the home page, and the only one that changes a decision here (nothing is
+ * charged now) survives on the last step.
+ */
 const STEPS = [
   {
     eyebrow: "Зал",
@@ -54,36 +61,27 @@ const STEPS = [
       "залов"
     )}.`,
     italic: "Выберите один.",
-    note: "Цены и кресла везде одинаковые. Часы работы немного разные, а воскресенье отличается сильнее всего.",
   },
   {
     eyebrow: "Услуга",
     roman: "Что будем",
     italic: "делать?",
-    note: `Одна услуга, одна посадка. Если нужно две подряд в одном кресле (стрижка и бритьё вместе), позвоните на ${shop.phone}, и мы соберём запись вручную.`,
   },
   {
     eyebrow: "Кресло",
     roman: "В чьи",
     italic: "руки?",
-    note: "Назовите имя или оставьте выбор нам. Здесь никто не взаимозаменяем и никто не компромисс.",
   },
   {
     eyebrow: "Время",
     roman: "Когда вам",
     italic: "удобно сесть?",
-    note: `${spell(DAY_COUNT, "m")} ${plural(
-      DAY_COUNT,
-      "день",
-      "дня",
-      "дней"
-    )} вперёд. Занятые часы показаны серым, выбрать их нельзя.`,
   },
   {
     eyebrow: "Вы",
     roman: "Для кого",
     italic: "держим кресло?",
-    note: "Сейчас ничего не списывается. Рассчитаетесь в кресле картой, СБП или наличными, а перенести время бесплатно можно не позже чем за шесть часов.",
+    note: "Сейчас ничего не списывается — рассчитаетесь в кресле.",
   },
 ] as const;
 
@@ -159,6 +157,7 @@ export function BookingFlow() {
    */
   const mounted = useRef(false);
   const wantsFocus = useRef(false);
+  const lenis = useLenis();
 
   const stepPanel = useCallback((node: HTMLDivElement | null) => {
     if (node && wantsFocus.current) {
@@ -173,8 +172,12 @@ export function BookingFlow() {
       return;
     }
     wantsFocus.current = true;
-    window.scrollTo(0, 0);
-  }, [step]);
+    /* Through Lenis rather than `window.scrollTo`: a step advanced while the
+       smooth scroll was still settling would have had its jump overwritten by
+       the next frame of the glide, and the new step would open mid-page. */
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+    else window.scrollTo(0, 0);
+  }, [step, lenis]);
 
   const pickLocation = (id: string) => {
     /* Hours differ room to room, so a held time cannot survive the move. */
@@ -255,15 +258,14 @@ export function BookingFlow() {
   ];
 
   const total = service ? service.price : null;
-  const minutes = service ? service.minutes : null;
 
   const done = step === DONE;
   const current = STEPS[Math.min(step, STEP_COUNT) - 1];
 
   return (
     <section
-      data-tone="ink"
-      className="relative min-h-svh bg-ember text-ink"
+      data-tone="paper"
+      className="relative min-h-svh lamp bg-espresso text-paper"
     >
       <div className="edge pt-[clamp(6.5rem,17svh,11rem)] pb-[clamp(4.5rem,10vw,9rem)]">
         {/* ----------------------------------------------- progress head */}
@@ -282,7 +284,7 @@ export function BookingFlow() {
             <button
               type="button"
               onClick={() => setStep((s) => s - 1)}
-              className="ui group inline-flex items-center gap-2 border-b border-current/30 pb-1 transition-opacity duration-500 hover:opacity-60"
+              className="ui tap-reach group inline-flex items-center gap-2 border-b border-current/30 pb-1 transition-opacity duration-500 hover:opacity-60"
             >
               <span
                 aria-hidden="true"
@@ -297,16 +299,9 @@ export function BookingFlow() {
           )}
         </div>
 
-        <div className="mt-4 flex gap-[4px]" aria-hidden="true">
-          {Array.from({ length: STEP_COUNT }, (_, i) => (
-            <span
-              key={i}
-              className={`h-[2px] flex-1 transition-colors duration-700 ${EASE_CLASS} ${
-                done || i < step ? "bg-ink" : "bg-ink/20"
-              }`}
-            />
-          ))}
-        </div>
+        {/* The five-segment rule that used to sit here said the same thing as
+            "Шаг 03 / 05" directly above it, one inch lower and in a different
+            language. One counter is a counter; two are decoration. */}
 
         {!done && <SummaryBar rows={rows} total={total} />}
 
@@ -342,17 +337,19 @@ export function BookingFlow() {
                       ]}
                     />
 
-                    <Rise
-                      animateOnMount
-                      delay={0.08}
-                      y={16}
-                      duration={0.55}
-                      className="mt-[clamp(1.5rem,3vw,2.5rem)]"
-                    >
-                      <p className="note max-w-[34ch] opacity-75 md:ml-auto md:text-right">
-                        {current.note}
-                      </p>
-                    </Rise>
+                    {"note" in current ? (
+                      <Rise
+                        animateOnMount
+                        delay={0.08}
+                        y={16}
+                        duration={0.55}
+                        className="mt-[clamp(1.5rem,3vw,2.5rem)]"
+                      >
+                        <p className="note max-w-[40ch] opacity-75">
+                          {current.note}
+                        </p>
+                      </Rise>
+                    ) : null}
 
                     <Rise
                       animateOnMount
@@ -384,7 +381,6 @@ export function BookingFlow() {
             <SummaryRail
               rows={rows}
               total={total}
-              minutes={minutes}
               currentStep={step}
               onJump={jump}
             />
@@ -434,8 +430,6 @@ function StepBody({
               index={String(i + 1).padStart(2, "0")}
               title={location.name}
               detail={location.address}
-              aside={location.city}
-              valueNote={count(location.chairs, "кресло", "кресла", "кресел")}
               selected={chosen.location === location.id}
               onSelect={() => onLocation(location.id)}
             />
@@ -459,7 +453,6 @@ function StepBody({
             index={s.index}
             title={s.name}
             detail={`${s.minutes} мин`}
-            aside={s.blurb}
             value={money(s.price)}
             selected={chosen.service === s.id}
             onSelect={() => onService(s.id)}
@@ -479,7 +472,7 @@ function StepBody({
             media={
               /* A span, not a div: this sits inside the row's button, and a
                  button may only hold phrasing content. */
-              <span className="relative block size-[clamp(3.25rem,5.5vw,4.75rem)] overflow-hidden rounded-[10px] bg-ink/10">
+              <span className="relative block size-[clamp(3.25rem,5.5vw,4.75rem)] overflow-hidden rounded-[10px] bg-paper/10">
                 <Image
                   src={b.image}
                   alt={`Портрет: ${b.name}, ${readableRole(b.role)} в «${
@@ -494,8 +487,6 @@ function StepBody({
             }
             title={b.name}
             detail={b.role}
-            aside={b.specialties.join(" · ")}
-            valueNote={spellYears(b.years)}
             selected={chosen.barber === b.id}
             onSelect={() => onBarber(b.id)}
           />
@@ -511,7 +502,6 @@ function StepBody({
           }
           title={ANY_CHAIR.name}
           detail={ANY_CHAIR.role}
-          aside={ANY_CHAIR.detail}
           selected={chosen.barber === ANY_CHAIR.id}
           onSelect={() => onBarber(ANY_CHAIR.id)}
         />

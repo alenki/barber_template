@@ -4,20 +4,20 @@ import { useId, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { faqs, locations, shop, BOOK_LABEL } from "@/lib/content";
+import { faqs, shop, BOOK_LABEL } from "@/lib/content";
 import { SplitText, Rise } from "@/components/motion/SplitText";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * "Записаться" is set to the exact width of the gutter-to-gutter column.
- * The headline measures 4.4925em wide in Playfair italic at the `.mega`
- * tracking, so dividing the container's inline size by 4.55 fills the line
+ * The headline measures 4.7225em wide in Playfair italic at the `.mega`
+ * tracking, so dividing the container's inline size by 4.78 fills the line
  * edge to edge with roughly one percent of slack for the italic overhang.
  * Overriding `--text-mega` keeps the `.mega` utility intact; `cqw` is used
  * rather than `vw` so a desktop scrollbar can never push the line wide.
  */
-const MEGA_FIT = { "--text-mega": "calc(100cqw / 4.55)" } as CSSProperties;
+const MEGA_FIT = { "--text-mega": "calc(100cqw / 4.78)" } as CSSProperties;
 const MEGA_CONTAINER = { containerType: "inline-size" } as CSSProperties;
 
 export function BookFaq() {
@@ -27,23 +27,11 @@ export function BookFaq() {
   return (
     <section
       data-tone="paper"
-      className="relative bg-ink text-paper py-[clamp(5rem,11vw,12rem)]"
+      className="relative lamp bg-ink text-paper py-[clamp(5rem,11vw,12rem)]"
     >
       {/* ---------------------------------------------------------- book */}
 
-      <Rise className="edge flex items-baseline justify-between gap-6">
-        <span className="label text-paper/70">Запись</span>
-        {/* -my-3 py-3 keeps the optical position while giving the tap target
-            the height it needs on a phone. */}
-        <a
-          href={shop.phoneHref}
-          className="label -my-3 inline-block py-3 text-paper/70 transition-colors duration-500 hover:text-paper"
-        >
-          {shop.phone}
-        </a>
-      </Rise>
-
-      <div className="edge mt-[clamp(2rem,4vw,3.5rem)]" style={MEGA_CONTAINER}>
+      <div className="edge" style={MEGA_CONTAINER}>
         <div style={MEGA_FIT}>
           <SplitText
             as="h2"
@@ -66,7 +54,7 @@ export function BookFaq() {
         <Rise className="md:col-span-6">
           <Link
             href="/book"
-            className="ease-[cubic-bezier(0.16,1,0.3,1)] flex aspect-square w-[clamp(11rem,16vw,13rem)] items-center justify-center rounded-full bg-ember text-ink transition-transform duration-700 hover:scale-[1.06] focus-visible:scale-[1.06]"
+            className="ease-[cubic-bezier(0.16,1,0.3,1)] flex aspect-square w-[clamp(11rem,16vw,13rem)] items-center justify-center rounded-full bg-brass text-ink transition-transform duration-700 hover:scale-[1.06] focus-visible:scale-[1.06]"
           >
             <span className="display max-w-[9ch] text-center text-[clamp(1.35rem,2.3vw,1.85rem)] italic">
               Занять кресло
@@ -78,44 +66,14 @@ export function BookFaq() {
           delay={0.1}
           className="md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9"
         >
+          {/* One paragraph. The second one said what the FAQ two screens down
+              says at length, and the three hours tables that used to close
+              this block were the same three tables the Adresa slab draws. */}
           <p className="note max-w-[40ch] text-paper/70">
-            Запись онлайн занимает меньше минуты. Выберите зал, услугу и
-            мастера, или оставьте кресло на наше усмотрение.
-          </p>
-          <p className="note mt-5 max-w-[40ch] text-paper/70">
-            Ничего не списывается заранее, рассчитываетесь в кресле. Отмена
-            бесплатна не позже чем за шесть часов.
+            Запись онлайн занимает меньше минуты. Ничего не списывается
+            заранее — рассчитываетесь в кресле.
           </p>
         </Rise>
-      </div>
-
-      <div className="edge mt-[clamp(4rem,9vw,9rem)]">
-        <div className="h-px w-full bg-paper/20" />
-        <div className="grid gap-y-10 pt-8 md:grid-cols-3 md:gap-x-8 md:pt-10">
-          {locations.map((location, i) => (
-            <Rise key={location.id} delay={i * 0.08}>
-              <p className="display text-[clamp(1.5rem,2.6vw,2.4rem)] italic">
-                {location.name}
-              </p>
-              {/* The same table Locations draws, drawn the same way: hairline
-                  rows, day left, hour right. Two treatments of one object on
-                  one page read as two components. */}
-              <dl className="m-0 mt-5 border-b border-paper/20">
-                {location.hours.map((h) => (
-                  <div
-                    key={h.days}
-                    className="flex items-baseline justify-between gap-4 border-t border-paper/20 py-2"
-                  >
-                    <dt className="label m-0 text-paper/70">{h.days}</dt>
-                    <dd className="label m-0 text-right tabular-nums">
-                      {h.time}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Rise>
-          ))}
-        </div>
       </div>
 
       {/* ----------------------------------------------------------- faq */}
@@ -125,14 +83,11 @@ export function BookFaq() {
             address and the note across four lines apiece. */}
         <Rise className="md:col-span-4 md:self-start md:sticky md:top-28 lg:col-span-3">
           <p className="label text-paper/70">Вопросы</p>
-          {/* /45 measured 4.2:1 against the ink slab, under the floor for
-              type this small. /65 clears it without lifting off the page. */}
-          <p className="note mt-6 max-w-[26ch] text-paper/65">
-            Если остались вопросы, напишите.
-          </p>
+          {/* /70 rather than /45: the latter measured 4.2:1 against the ink
+              slab, under the floor for type this small. */}
           <a
             href={`mailto:${shop.email}`}
-            className="note mt-1 inline-block py-2 text-paper/70 underline-offset-4 transition-colors duration-500 hover:text-paper hover:underline"
+            className="note tap mt-4 text-paper/70 underline-offset-4 transition-colors duration-500 hover:text-paper hover:underline"
           >
             {shop.email}
           </a>

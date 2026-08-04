@@ -2,18 +2,35 @@
 
 /* ============================================================
    МИЛЛИМЕТР · design tokens
-   Three colours. No gradients. No shadows except one lifted pill.
-   The whole system is: enormous type, enormous space, one signal colour.
+   Dark fields, bone type, one metal. No gradients. No shadows
+   except one lifted pill.
    Every fallback below carries Cyrillic; a Latin-only fallback would
    drop the site into a substitute face mid-word on first paint.
+
+   Rebranding a client starts and ends with the six values below.
    ============================================================ */
 
 @theme {
-  --color-ember: #ff5a1f;
-  --color-ember-deep: #d63f0c;
-  --color-ink: #0a0908;
-  --color-paper: #ffffff;
-  --color-ash: #6b6560;
+  /* Espresso carries the opening slab of every route: stained wood and old
+     leather, warm enough that the photography sits inside it rather than on
+     top of it. It is a hair off `ink` on purpose — the two dark slabs have to
+     read as one material at different depths, not as two colours. */
+  --color-espresso: #241d17;
+  /* The floor. Warm near-black rather than true black, so the shadow detail in
+     the photographs does not fall off a cliff at the edge of the frame. */
+  --color-ink: #141210;
+  /* The metal: clipper housings, the rail on a Koken chair, the till. It is
+     the whole accent budget, spent on rules, numerals and one hovered word at
+     a time — never on a field. Only ever on a dark slab (6.8:1 on espresso);
+     on bone it drops to 2.1:1, which is what `brass-deep` is for. */
+  --color-brass: #c2a06b;
+  /* The same metal darkened until it holds its own on a bone slab (6.1:1),
+     for hover and pressed states there. */
+  --color-brass-deep: #6d5228;
+  /* Bone, not white: the light slabs are a lather-and-towel colour, which is
+     the only way they read as a material next to two dark ones. */
+  --color-paper: #f0eae0;
+  --color-ash: #6b6055;
 
   --font-display: var(--font-display), "Times New Roman", serif;
   --font-sans: var(--font-sans), system-ui, sans-serif;
@@ -28,16 +45,36 @@
 
   /* `lg` and `xl` collide with Tailwind's own size keys, so its default
      `--text-lg--line-height` (1.556) and `--text-xl--line-height` (1.4)
-     survive and outrank `.display`'s 0.86; every card title on the site was
+     survive and outrank `.display`'s leading; every card title on the site was
      silently setting at magazine leading. Pinning them here fixes all of it at
      once. Smaller display sizes want fractionally more leading than the mega
-     ones, hence 0.95/0.9 rather than a flat 0.86. */
-  --text-xl--line-height: 0.9;
-  --text-lg--line-height: 0.95;
+     ones, hence the ladder rather than a flat number.
+
+     All three sit a step looser than the Latin build did, for the reason given
+     on `.display`: a line of Russian lowercase tops out at the x-height, so the
+     band of ink is short and the gap above it reads as part of the line rather
+     than as leading. */
+  --text-xl--line-height: 0.95;
+  --text-lg--line-height: 1;
   --text-md--line-height: 1.4;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+
+  /* The page is drawn `viewport-fit=cover`, so on a notched phone held sideways
+     the display cuts into the layout viewport and a plain 1.25rem gutter puts
+     the hours tables and the addresses under the sensor housing. `max()` lifts
+     the gutter to clear whichever inset is live and is a no-op everywhere else
+     — in portrait, and on every device without a cutout, both env() read 0.
+     Symmetric rather than per-side: the column stays centred, which matters on
+     a site whose section titles are measured to run gutter to gutter. */
+  --gutter: max(
+    clamp(1.25rem, 4vw, 4.5rem),
+    env(safe-area-inset-left, 0px),
+    env(safe-area-inset-right, 0px)
+  );
+
+  /* The floor for anything a thumb has to hit. */
+  --tap: 44px;
 }
 
 /* ============================================================
@@ -55,7 +92,30 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    /* The fallback for anchors before Lenis mounts, and for good with JS off.
+       Once Lenis is running it eases the same travel itself, and leaving the
+       native smoothing on would set the two easings fighting over the same
+       scroll position. `.lenis` is the class Lenis puts on <html>. */
     scroll-behavior: smooth;
+  }
+
+  html.lenis {
+    scroll-behavior: auto;
+    /* Lenis measures the document, so neither element may be pinned to the
+       viewport height. Nothing here sets that today; the rule is what keeps a
+       later `height: 100%` from silently capping the scroll at one screen. */
+    height: auto;
+  }
+
+  html.lenis body {
+    height: auto;
+  }
+
+  /* `lenis.stop()` — the mobile menu is the only caller — parks the virtual
+     scroll. Without a real lock the wheel would still move the page behind
+     the overlay. */
+  html.lenis.lenis-stopped {
+    overflow: clip;
   }
 
   body {
@@ -71,15 +131,15 @@
   }
 
   ::selection {
-    background: var(--color-ember);
+    background: var(--color-brass);
     color: var(--color-ink);
   }
 
   /* currentColor alone goes invisible whenever a control's own type colour
-     matches the slab behind it (ember type on an ember slab, for instance), so
-     the ring is drawn in the slab's opposite instead. Ink on ember measures
-     6.4:1 and ink on paper 21:1; both are plenty on their own, and a halo
-     there only turned every focused input into a loud white box. */
+     matches the slab behind it (brass type on a brass fill, for instance), so
+     the ring is drawn in the slab's opposite instead. Bone on espresso
+     measures 13.9:1 and ink on bone 15.6:1; both are plenty on their own, and
+     a halo there only turned every focused input into a loud white box. */
   :focus-visible {
     outline: 2px solid var(--color-ink);
     outline-offset: 3px;
@@ -89,7 +149,7 @@
      paper ring alone can land on a bright highlight, hence the ink halo. */
   [data-tone="paper"] :focus-visible {
     outline-color: var(--color-paper);
-    box-shadow: 0 0 0 5px rgb(10 9 8 / 0.9);
+    box-shadow: 0 0 0 5px rgb(20 18 16 / 0.9);
   }
 
   img {
@@ -109,6 +169,19 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* Safari paints a grey box over the whole hit area on tap. On a site built
+     out of flat colour slabs and hairlines that reads as a rendering fault,
+     and every control here already answers with its own transition. The
+     `:focus-visible` ring above is untouched, so keyboard feedback stays. */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* The mobile menu is a full-screen overlay; the Book pill sits a layer above
@@ -139,24 +212,45 @@
 /* Playfair's `opsz` axis runs 5–1200: the higher it goes the thinner the
    hairlines and the sharper the serifs. These headlines are set enormous, so
    they want the display end of it; 96 is where the Didone contrast arrives
-   without the thins breaking up on a phone. */
+   without the thins breaking up on a phone.
+   ------------------------------------------------------------------
+   Tracking and leading are both a step looser than the same face wants in
+   English, and both for the same reason: Cyrillic lowercase is a flat band.
+   • Tracking. Half the alphabet — и н п ц ш щ ю м л — is built from repeated
+     vertical stems, where Latin lowercase varies its silhouette with
+     ascenders and bowls. At the -0.038em the Latin build used, "разницу"
+     closed up into a picket fence and "Барбершоп" ran шп together. Latin
+     absorbs that much negative tracking because its letters do not look
+     alike; Cyrillic does not.
+   • Leading. A Russian line has almost no ascenders, so its ink stops at the
+     x-height and the space above it belongs to the line, not to the gap. At
+     0.86 the descenders of one line (у ц д р щ) sat in the next line's caps.
+   Both numbers stay negative and tight — this is still poster type — but the
+   word images have to survive being read. */
 @utility display {
   font-family: var(--font-display);
   font-weight: 400;
-  line-height: 0.86;
-  letter-spacing: -0.038em;
+  line-height: 0.92;
+  letter-spacing: -0.016em;
   font-variation-settings: "opsz" 96;
   text-wrap: balance;
 }
 
-/* The single-word section titles that span the whole viewport */
+/* The single-word section titles that span the whole viewport.
+   Playfair's Cyrillic italic is a true cursive — «Услуги» is drawn with joined,
+   swashy strokes rather than a slanted roman — so its letters already reach
+   into each other's space. At -0.045em the у's descending loop crossed the
+   г beside it and сл fused into one mark. -0.022em keeps the word one
+   continuous gesture without any pair actually colliding.
+   Every component that sizes a mega word to the column measures it in em at
+   THIS number; changing it means re-measuring those fits. */
 @utility mega {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
   font-size: var(--text-mega);
   line-height: 0.78;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.022em;
   /* Bigger than `.display`, so it can take the axis further still. */
   font-variation-settings: "opsz" 200;
 }
@@ -195,8 +289,109 @@
    LAYOUT PRIMITIVES
    ============================================================ */
 
+/* The lit room. A dark slab painted as one flat value is a wall of paint at
+   this size; the same value with a lamp over it is a room. Two layers, both
+   background-images so they compose straight onto `bg-espresso`/`bg-ink`
+   without an extra element or a change to anything's stacking:
+
+   1. a warm pool falling from above the top edge, in brass rather than white,
+      because the light in these rooms comes off bulbs around a mirror;
+   2. a vignette that closes the corners down toward ink.
+
+   Percentages, never pixels: a slab is one screen on a phone and three on a
+   monitor, and the light has to sit in the same place on both. Deliberately
+   below the threshold where it reads as a gradient — if you can see where it
+   ends, it is too strong. Not for the footer, which already carries a
+   photograph and a scrim of its own. */
+@utility lamp {
+  background-image:
+    radial-gradient(
+      120% 75% at 50% -10%,
+      rgb(194 160 107 / 0.11),
+      transparent 60%
+    ),
+    radial-gradient(118% 88% at 50% 45%, transparent 48%, rgb(0 0 0 / 0.3));
+}
+
+/* A millimetre rule, drawn. The shop is called Миллиметр and its mark is six
+   bars stepping from solid to hairline; this is the same idea unrolled into a
+   line, and it is the anchor the three beats of the visit hang off.
+
+   Three background layers over one another, all pinned to the bottom edge so
+   the ticks stand up off the baseline: majors, minors, then the baseline
+   itself. Minors sit at 55% so the rule reads as a scale rather than a fence.
+   `color-mix` rather than a second hex, so a rebrand still only touches the
+   six values in `@theme`. */
+@utility ruler {
+  height: 0.85rem;
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size:
+    100% 0.85rem,
+    100% 0.38rem,
+    100% 1px;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      var(--color-brass) 0 1px,
+      transparent 1px 2.5rem
+    ),
+    repeating-linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-brass) 55%, transparent) 0 1px,
+      transparent 1px 0.5rem
+    ),
+    linear-gradient(var(--color-brass), var(--color-brass));
+}
+
 @utility edge {
   padding-inline: var(--gutter);
+}
+
+/* ------------------------------------------------------------------
+   A thumb is about 9mm across and lands nowhere near as precisely as a
+   cursor. Small type is the house voice here — the typewriter face runs at
+   13px and the inline links are set in it — so rather than fatten the type,
+   the hit area is grown around it and the extra height is pulled back out of
+   the flow with a negative block margin. Nothing moves; the target trebles.
+
+   `inline-flex` rather than `block`: these are mid-sentence links and a block
+   would break the line they sit on. `align-items: center` keeps the text
+   optically where it was before the padding arrived.
+   ------------------------------------------------------------------ */
+@utility tap {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+}
+
+/* The same floor for something already laid out as a block or a flex row,
+   where only the shortfall in height needs making up. */
+@utility tap-block {
+  min-height: var(--tap);
+}
+
+/* For a link whose design *is* its box: the small-caps CTAs that draw a rule
+   tight under the word, and the underlined addresses. Growing those with
+   padding drops the rule away from the text and breaks the one detail the
+   style is made of, so the hit area is thrown instead — an invisible 44px band
+   centred on the text, laid over the top of it. The link keeps its exact
+   measurements and the thumb gets the whole band.
+
+   `inset-inline: 0` rather than a fixed width so it tracks the label, and no
+   `z-index`, so the band sits above the link's own background but under
+   anything the page has deliberately stacked over it. */
+@utility tap-reach {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    height: var(--tap);
+  }
 }
 
 @utility slab {

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 /**
  * A thin wrapper. The flow reads `?barber=` with `useSearchParams`, which
- * needs a Suspense boundary above it; the fallback is the same ember slab
+ * needs a Suspense boundary above it; the fallback is the same espresso slab
  * carrying the same `data-tone`, so the fixed header never flickers.
  */
 export default function BookPage() {
@@ -32,8 +32,8 @@ export default function BookPage() {
 function BookingFallback() {
   return (
     <section
-      data-tone="ink"
-      className="relative min-h-svh bg-ember text-ink"
+      data-tone="paper"
+      className="relative min-h-svh lamp bg-espresso text-paper"
       aria-busy="true"
     >
       <div className="edge pt-[clamp(6.5rem,17svh,11rem)]">

@@ -21,23 +21,18 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const TITLE = "Услуги";
 
 /**
- * "Услуги" set in Playfair italic at the .mega tracking (-0.045em) measures
- * 2.289x its own font-size. Dividing the container's own inline size by that
+ * "Услуги" set in Playfair italic at the .mega tracking (-0.022em) measures
+ * 2.427x its own font-size. Dividing the container's own inline size by that
  * lands the word flush against both gutters at every width, but only if the
  * container IS the gutter-to-gutter column, hence `containerType` on the .edge
  * div rather than on a full-bleed parent. cqw, not vw, keeps a desktop
- * scrollbar out of the sum. 2.32 rather than 2.289 leaves a hair of slack so
+ * scrollbar out of the sum. 2.46 rather than 2.427 leaves a hair of slack so
  * the italic overhang on the final "и" is never clipped.
  */
-const TITLE_FILL = "calc(100cqw / 2.32)";
+const TITLE_FILL = "calc(100cqw / 2.46)";
 
 const PREVIEW_W = 320;
 const PREVIEW_H = 420;
-
-/** Derived from content; never hardcode a price or a duration. */
-const MIN_PRICE = Math.min(...services.map((s) => s.price));
-const MIN_MINUTES = Math.min(...services.map((s) => s.minutes));
-const MAX_MINUTES = Math.max(...services.map((s) => s.minutes));
 
 const altFor = (name: string) => `«${name}» в работе в «${shop.name}»`;
 
@@ -90,26 +85,11 @@ export function Services() {
       className="relative bg-paper text-ink py-[clamp(5rem,11vw,12rem)]"
       onMouseEnter={fine ? () => setWarm(true) : undefined}
     >
-      {/* ── eyebrow ─────────────────────────────────────────────── */}
-      {/* The count rides the eyebrow's hairline rather than floating in the
-          gap above the title: the same header row Chairs and /services use,
-          held at 62% so the asymmetry survives. */}
-      <Rise className="edge">
-        <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4 md:ml-[62%]">
-          <p className="label">
-            От {money(MIN_PRICE)} · от {MIN_MINUTES} до {MAX_MINUTES} минут
-          </p>
-          <span
-            aria-hidden="true"
-            className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
-          >
-            {services.length}
-          </span>
-        </div>
-      </Rise>
-
       {/* ── the word ────────────────────────────────────────────── */}
-      <div className="mt-[clamp(3rem,7vw,6rem)]">
+      {/* No eyebrow, no count badge: the price range and the number of
+          services are both legible from the list six inches below, and a
+          caption that repeats the thing it captions is just more ink. */}
+      <div>
         <div
           className="edge overflow-x-clip"
           style={{ containerType: "inline-size" }}
@@ -165,15 +145,15 @@ export function Services() {
                   onMouseEnter={fine ? () => setHovered(i) : undefined}
                   onFocus={() => setFocused(i)}
                   onBlur={() => setFocused(null)}
-                  className={`edge grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-[clamp(0.85rem,2.5vw,2.5rem)] gap-y-3 py-9 transition-[opacity,color] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:grid-cols-[5rem_minmax(0,1fr)_8rem_auto] md:py-[clamp(2.5rem,4vw,4rem)] lg:grid-cols-[7rem_minmax(0,1fr)_10rem_auto] lg:py-[clamp(3rem,4.6vw,5rem)] ${
-                    on ? "text-ember-deep" : ""
+                  className={`edge grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-[clamp(0.85rem,2.5vw,2.5rem)] py-9 transition-[opacity,color] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:grid-cols-[5rem_minmax(0,1fr)_auto] md:py-[clamp(2.5rem,4vw,4rem)] lg:grid-cols-[7rem_minmax(0,1fr)_auto] lg:py-[clamp(3rem,4.6vw,5rem)] ${
+                    on ? "text-brass-deep" : ""
                   } ${dim ? "opacity-[0.55]" : "opacity-100"}`}
                 >
                   {/* mobile thumbnail: the cursor preview's stand-in.
                       alt="" on purpose: it is decorative here, and a real alt
                       made screen readers announce the service name twice
                       inside the same link. */}
-                  <span className="col-start-1 row-span-2 row-start-1 block h-14 w-14 self-center overflow-hidden rounded-[10px] bg-ink/10 md:hidden">
+                  <span className="col-start-1 row-start-1 block h-14 w-14 self-center overflow-hidden rounded-[10px] bg-ink/10 md:hidden">
                     <Image
                       src={service.image}
                       alt=""
@@ -184,23 +164,22 @@ export function Services() {
                     />
                   </span>
 
+                  {/* The minute count came off this row: it is on /services
+                      against every one of these names, and here it was a third
+                      number competing with the price for the same glance. */}
                   <span
-                    className={`label col-start-2 row-start-1 md:col-start-1 md:row-start-1 ${shift}`}
+                    className={`label col-start-2 row-start-1 hidden md:col-start-1 md:block ${shift}`}
                   >
                     {service.index}
                   </span>
 
-                  <span className="label col-start-3 row-start-1 text-right md:col-start-3 md:row-start-1 md:text-left">
-                    {service.minutes} мин
-                  </span>
-
                   <span
-                    className={`display col-start-2 row-start-2 text-lg italic md:col-start-2 md:row-start-1 ${shift}`}
+                    className={`display col-start-2 row-start-1 text-lg italic md:col-start-2 ${shift}`}
                   >
                     {service.name}
                   </span>
 
-                  <span className="display col-start-3 row-start-2 text-right text-lg whitespace-nowrap md:col-start-4 md:row-start-1">
+                  <span className="display col-start-3 row-start-1 text-right text-lg whitespace-nowrap md:col-start-3">
                     {money(service.price)}
                   </span>
                 </Link>
@@ -217,7 +196,7 @@ export function Services() {
             <span className="display text-xl italic whitespace-nowrap">
               {word}
             </span>
-            <span className="mx-[clamp(1.25rem,3vw,3.25rem)] block h-2.5 w-2.5 shrink-0 rounded-full bg-ember lg:h-3.5 lg:w-3.5" />
+            <span className="mx-[clamp(1.25rem,3vw,3.25rem)] block h-2.5 w-2.5 shrink-0 rounded-full bg-brass lg:h-3.5 lg:w-3.5" />
           </span>
         ))}
       </Marquee>
@@ -225,7 +204,7 @@ export function Services() {
       <div className="edge mt-[clamp(3rem,6vw,5rem)] flex justify-end">
         <Link
           href="/services"
-          className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember-deep"
+          className="ui tap-reach group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-brass-deep"
         >
           Все услуги и цены
           <span

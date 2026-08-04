@@ -8,8 +8,8 @@ import { Frame } from "@/components/motion/Frame";
 export function Hero() {
   return (
     <section
-      data-tone="ink"
-      className="relative bg-ember text-ink pt-[22vh] md:pt-[26vh]"
+      data-tone="paper"
+      className="relative lamp bg-espresso text-paper pt-[22vh] md:pt-[26vh]"
     >
       <div className="edge">
         <SplitText
@@ -17,7 +17,12 @@ export function Hero() {
           animateOnMount
           delay={0.3}
           stagger={0.05}
-          className="display mx-auto max-w-[19ch] text-center text-hero"
+          /* 20ch, not 19: `ch` is the width of a "0" and so is blind to
+             letter-spacing, and the looser Cyrillic tracking on `.display`
+             pushed the line just past 19ch. That dropped the headline to four
+             lines and broke the roman mid-clause; 20ch restores the three-line
+             set where the italic phrase gets a line of its own. */
+          className="display mx-auto max-w-[20ch] text-center text-hero"
           segments={[{ text: hero.roman }, { text: hero.italic, italic: true }]}
         />
 

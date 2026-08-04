@@ -14,12 +14,9 @@ import { count, money, plural, spell } from "@/lib/words";
 
 
 const prices = [...services.map((s) => s.price), ...combos.map((c) => c.price)];
-const minutes = [...services.map((s) => s.minutes), ...combos.map((c) => c.minutes)];
 
+/** Only the floor is quoted, and only in the page description. */
 const LOW = Math.min(...prices);
-const HIGH = Math.max(...prices);
-const SHORTEST = Math.min(...minutes);
-const LONGEST = Math.max(...minutes);
 
 /**
  * Alt text for the six service photographs. content.ts carries the paths,
@@ -90,8 +87,8 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      {/* ---------------- Ember: the title ---------------- */}
-      <section data-tone="ink" className="relative bg-ember text-ink">
+      {/* ---------------- Espresso: the title ---------------- */}
+      <section data-tone="paper" className="relative lamp bg-espresso text-paper">
         <div className="edge pt-[32svh] pb-[clamp(5rem,11vw,12rem)] md:pt-[36svh]">
           <Rise className="border-t border-current/20 pt-4">
             <p className="label">Услуги и цены</p>
@@ -113,29 +110,13 @@ export default function ServicesPage() {
             ]}
           />
 
-          <Rise
-            delay={0.2}
-            className="mt-[14svh] flex flex-wrap items-baseline gap-x-10 gap-y-2 border-t border-current/20 pt-5 md:mt-[20svh]"
-          >
-            <span className="label">
-              {count(services.length, "услуга", "услуги", "услуг")}
-            </span>
-            <span className="label">
-              {count(combos.length, "комбинация", "комбинации", "комбинаций")}
-            </span>
-            <span className="label whitespace-nowrap">
-              {money(LOW)}-{money(HIGH)}
-            </span>
-            <span className="label">
-              {SHORTEST}-{LONGEST} минут
-            </span>
-          </Rise>
-
-          <Rise delay={0.3} className="mt-10 flex md:mt-14 md:justify-end">
+          {/* The four-statistic strip that used to sit here counted things the
+              list underneath states one by one, in its own type, with names
+              attached. One sentence is enough of an opener. */}
+          <Rise delay={0.3} className="mt-[14svh] flex md:mt-[20svh] md:justify-end">
             <p className="note max-w-[34ch] md:text-right">
               В каждую цену входит консультация, горячее полотенце и ровно
-              столько времени, сколько нужно. Ничего на этой странице не
-              навязывается сверху.
+              столько времени, сколько нужно.
             </p>
           </Rise>
         </div>
@@ -143,44 +124,25 @@ export default function ServicesPage() {
 
       {/* ---------------- Paper: the six, in full ---------------- */}
       <section data-tone="ink" className="slab bg-paper text-ink">
-        <div className="flex items-center justify-between gap-6 border-t border-current/20 pt-4">
-          <span className="label">
-            {services[0].index}-{services[services.length - 1].index}
-          </span>
-          <span
-            className="display flex size-[clamp(2.6rem,4.6vw,4.75rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.1rem,2vw,2.1rem)] text-ink italic"
-            aria-hidden="true"
-          >
-            {services.length}
-          </span>
-        </div>
-
-        <ul className="m-0 mt-16 list-none p-0 md:mt-24">
+        <ul className="m-0 list-none p-0">
           {services.map((service, i) => (
             <ServiceRow key={service.id} service={service} imageLeft={i % 2 === 0} />
           ))}
         </ul>
       </section>
 
-      {/* ---------------- Ember: combinations ---------------- */}
-      <section data-tone="ink" className="relative bg-ember text-ink">
+      {/* ---------------- Espresso: combinations ---------------- */}
+      <section data-tone="paper" className="relative lamp bg-espresso text-paper">
         <div className="edge py-[clamp(5rem,11vw,12rem)]">
-          <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
-            <span className="label">Комбинации</span>
-            <span className="label">
-              {count(combos.length, "вариант", "варианта", "вариантов")}
-            </span>
-          </div>
-
-          {/* "Вместе" measures 2.85em wide in Playfair italic at the mega
-              tracking, so the column's own inline size divided by 2.88 runs it
+          {/* "Вместе" measures 2.99em wide in Playfair italic at the mega
+              tracking, so the column's own inline size divided by 3.02 runs it
               gutter to gutter at every width. `cqw` rather than `vw` because a
               desktop scrollbar is part of `vw` and left the word 90px short. */}
           <div
             style={{ containerType: "inline-size" }}
-            className="mt-6 overflow-x-clip md:mt-10"
+            className="overflow-x-clip"
           >
-            <div style={{ "--text-mega": "calc(100cqw / 2.88)" } as CSSProperties}>
+            <div style={{ "--text-mega": "calc(100cqw / 3.02)" } as CSSProperties}>
               <SplitText
                 as="h2"
                 className="mega block"
@@ -197,19 +159,18 @@ export default function ServicesPage() {
           </Rise>
 
           <ul className="m-0 mt-16 list-none p-0 md:mt-24">
-            {combos.map((combo, i) => (
+            {combos.map((combo) => (
               <li
                 key={combo.name}
                 className="border-t border-current/20 py-6 md:py-9"
               >
-                <div className="flex items-baseline justify-between gap-4">
-                  <span className="label">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="label">{combo.minutes} мин</span>
-                </div>
-                <div className="mt-4 flex items-baseline justify-between gap-6 md:mt-5">
-                  <h3 className="display text-lg italic">{combo.name}</h3>
+                <div className="flex items-baseline justify-between gap-6">
+                  <h3 className="display text-lg italic">
+                    {combo.name}
+                    <span className="label ml-4 align-middle opacity-70">
+                      {combo.minutes} мин
+                    </span>
+                  </h3>
                   <span className="display shrink-0 text-lg whitespace-nowrap">
                     {money(combo.price)}
                   </span>
@@ -221,23 +182,18 @@ export default function ServicesPage() {
       </section>
 
       {/* ---------------- Ink: good to know ---------------- */}
-      <section data-tone="paper" className="slab bg-ink text-paper">
-        <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
-          <span className="label">Полезно знать</span>
-          <span className="label opacity-60">
-            {count(POLICIES.length, "заметка", "заметки", "заметок")}
-          </span>
-        </div>
-
+      <section data-tone="paper" className="slab lamp bg-ink text-paper">
         <SplitText
           as="h2"
-          className="display mt-8 max-w-[15ch] text-hero md:mt-12"
+          className="display max-w-[15ch] text-hero"
           segments={[
             { text: "Четыре вещи, которые" },
             { text: "стоит знать заранее.", italic: true },
           ]}
         />
 
+        {/* The numerals came off these: the headline already says four, and
+            they are read in whatever order the eye lands in. */}
         <div className="mt-16 grid grid-cols-1 gap-x-16 gap-y-14 md:mt-28 md:grid-cols-2 md:gap-x-24 md:gap-y-24">
           {POLICIES.map((p, i) => (
             <Rise
@@ -245,8 +201,7 @@ export default function ServicesPage() {
               delay={i * 0.06}
               className="border-t border-current/20 pt-5"
             >
-              <span className="label opacity-60">{p.n}</span>
-              <h3 className="display mt-5 text-lg italic">{p.title}</h3>
+              <h3 className="display text-lg italic">{p.title}</h3>
               <p className="note mt-5 max-w-[34ch] opacity-80">{p.body}</p>
             </Rise>
           ))}
@@ -255,12 +210,7 @@ export default function ServicesPage() {
 
       {/* ---------------- Paper: the close ---------------- */}
       <section data-tone="ink" className="slab bg-paper text-ink">
-        <div className="flex items-baseline justify-between gap-6 border-t border-current/20 pt-4">
-          <span className="label">Бронь</span>
-          <span className="label text-ash">Две минуты, без звонков</span>
-        </div>
-
-        <Link href="/book" className="group mt-10 block rounded-[10px] md:mt-16">
+        <Link href="/book" className="group block rounded-[10px]">
           <SplitText
             as="p"
             stagger={0.06}
@@ -274,17 +224,13 @@ export default function ServicesPage() {
           {/* Sticker on the left, like the one on the home page: the
               bottom-right corner belongs to the Book pill, and two booking
               circles stacked in it read as one broken control. */}
-          <Rise
-            delay={0.2}
-            className="mt-12 flex items-center justify-between gap-6 md:mt-20"
-          >
+          <Rise delay={0.2} className="mt-12 md:mt-20">
             <span
-              className="display flex size-[clamp(5.5rem,10vw,9rem)] shrink-0 items-center justify-center rounded-full bg-ember text-[clamp(1.05rem,1.8vw,1.75rem)] text-ink italic transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-[14deg]"
+              className="display flex size-[clamp(5.5rem,10vw,9rem)] shrink-0 items-center justify-center rounded-full bg-brass text-[clamp(1.05rem,1.8vw,1.75rem)] text-ink italic transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-[14deg]"
               aria-hidden="true"
             >
               Запись
             </span>
-            <span className="ui text-right">Услуга, кресло, время</span>
           </Rise>
         </Link>
       </section>

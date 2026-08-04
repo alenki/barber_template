@@ -3,31 +3,32 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import {
   clock,
-  CLOSED,
   dayLabel,
   freeCount,
-  monthShort,
   nowSnapshot,
   openingFor,
   serverSnapshot,
   slotsFor,
-  spell,
   subscribeNever,
   WEEKDAY,
   type Day,
   type Room,
   type Treatment,
 } from "./schedule";
-import { plural } from "@/lib/words";
 
 const EASE_CLASS = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
 /**
- * The diary. Fourteen days built from a date captured in an effect upstairs,
- * and the free hours in each of them derived from the room's opening times in
- * content.ts and the length of the service. Nothing here is invented at
- * render time; the booked-out hours come from a hash of the day and the slot,
- * so they are the same on every reload.
+ * The diary. Fourteen days built from a date captured upstairs, and the free
+ * hours in each of them derived from the room's opening times in content.ts and
+ * the length of the service. Nothing here is invented at render time; the
+ * booked-out hours come from a hash of the day and the slot, so they are the
+ * same on every reload.
+ *
+ * A tile says a weekday and a number, and an hour says an hour. The month, the
+ * opening times and the count of what is left were all captions on things the
+ * reader can already see; the one line under the grid names the chosen day in
+ * full and that is the whole of it.
  */
 export function TimeStep({
   room,
@@ -75,26 +76,13 @@ export function TimeStep({
   }, [date, firstOpen, onPickDay]);
 
   if (!days.length) {
-    return (
-      <p className="label opacity-75">Открываем запись…</p>
-    );
+    return <p className="label opacity-75">Открываем запись…</p>;
   }
-
-  const opening = day ? openingFor(room, day.weekday) : null;
-  const free = freeCount(slots);
 
   return (
     <div>
       {/* ---------------------------------------------------------- days */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-current/20 pt-4">
-        <span className="label">
-          Ближайшие {spell(days.length, "m").toLowerCase()}{" "}
-          {plural(days.length, "день", "дня", "дней")}
-        </span>
-        <span className="label opacity-75">{room.name}</span>
-      </div>
-
-      <ul className="m-0 mt-6 grid list-none grid-cols-4 gap-[6px] p-0 sm:grid-cols-5 md:mt-8 md:grid-cols-7">
+      <ul className="m-0 grid list-none grid-cols-4 gap-[6px] p-0 sm:grid-cols-5 md:grid-cols-7">
         {days.map((d, i) => {
           const closed = !openingFor(room, d.weekday).window;
           const spare = closed
@@ -112,10 +100,10 @@ export function TimeStep({
                 onClick={() => onPickDay(d.iso)}
                 className={`flex w-full flex-col items-center gap-1 rounded-[10px] border py-3 transition-colors duration-500 ${EASE_CLASS} ${
                   chosen
-                    ? "border-ink bg-ink text-ember"
+                    ? "border-brass bg-brass text-ink"
                     : unavailable
                       ? "cursor-not-allowed border-current/15 opacity-40"
-                      : "border-current/25 hover:border-ink hover:bg-ink hover:text-ember focus-visible:border-ink"
+                      : "border-current/25 hover:border-brass hover:bg-brass hover:text-ink focus-visible:border-brass"
                 }`}
               >
                 <span className="label leading-none opacity-75">
@@ -124,10 +112,11 @@ export function TimeStep({
                 <span className="display text-[clamp(1.35rem,2.4vw,2rem)] leading-none">
                   {String(d.dayOfMonth).padStart(2, "0")}
                 </span>
-                <span className="label leading-none opacity-75">
-                  {closed ? CLOSED : monthShort(d)}
+                <span className="sr-only">
+                  {dayLabel(d)}
+                  {i === 0 ? ", сегодня" : ""}
+                  {unavailable ? ", свободных часов нет" : ""}
                 </span>
-                {i === 0 ? <span className="sr-only">Сегодня</span> : null}
               </button>
             </li>
           );
@@ -136,26 +125,16 @@ export function TimeStep({
 
       {/* --------------------------------------------------------- hours */}
       <div className="mt-[clamp(2.5rem,5vw,4rem)]">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-current/20 pt-4">
-          <span className="label">
-            {day ? dayLabel(day) : "Выберите день"}
-            {opening?.window ? ` · ${opening.time}` : ""}
-          </span>
-          <span className="label opacity-75" role="status">
-            {day
-              ? free === 0
-                ? "Свободных часов нет"
-                : `Свободно ${free} из ${slots.length}`
-              : ""}
-          </span>
-        </div>
+        <p className="label" role="status">
+          {day ? dayLabel(day) : "Выберите день"}
+        </p>
 
         {slots.length === 0 ? (
           <p className="note mt-6 max-w-[36ch] opacity-75">
-            В этот день зал не работает. Выберите другой день или другой зал.
+            В этот день зал не работает.
           </p>
         ) : (
-          <ul className="m-0 mt-6 grid list-none grid-cols-3 gap-[6px] p-0 sm:grid-cols-4 md:mt-8 md:grid-cols-5">
+          <ul className="m-0 mt-5 grid list-none grid-cols-3 gap-[6px] p-0 sm:grid-cols-4 md:grid-cols-6">
             {slots.map((slot) => {
               const chosen = slot.start === time;
               return (
@@ -165,24 +144,18 @@ export function TimeStep({
                     disabled={slot.taken}
                     aria-pressed={chosen}
                     onClick={() => onPickTime(slot.start)}
-                    className={`flex w-full flex-col items-start gap-1 rounded-[10px] border px-3 py-3 text-left transition-colors duration-500 ${EASE_CLASS} ${
+                    className={`display flex w-full items-center justify-center rounded-[10px] border py-3 text-[clamp(1.15rem,1.9vw,1.65rem)] leading-none transition-colors duration-500 ${EASE_CLASS} ${
                       chosen
-                        ? "border-ink bg-ink text-ember"
+                        ? "border-brass bg-brass text-ink"
                         : slot.taken
-                          ? "cursor-not-allowed border-current/15 opacity-40"
-                          : "border-current/25 hover:border-ink hover:bg-ink hover:text-ember focus-visible:border-ink"
+                          ? "cursor-not-allowed border-current/15 line-through opacity-40"
+                          : "border-current/25 hover:border-brass hover:bg-brass hover:text-ink focus-visible:border-brass"
                     }`}
                   >
-                    <span
-                      className={`display text-[clamp(1.15rem,1.9vw,1.65rem)] leading-none ${
-                        slot.taken ? "line-through" : ""
-                      }`}
-                    >
-                      {clock(slot.start)}
-                    </span>
-                    <span className="label leading-none opacity-75">
-                      {slot.taken ? "Занято" : `до ${clock(slot.end)}`}
-                    </span>
+                    {clock(slot.start)}
+                    {slot.taken ? (
+                      <span className="sr-only">, занято</span>
+                    ) : null}
                   </button>
                 </li>
               );

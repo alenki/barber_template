@@ -90,12 +90,7 @@ export function DetailsForm({
 
   return (
     <form noValidate onSubmit={handleSubmit} className="max-w-[38rem]">
-      <Field
-        id={`${baseId}-name`}
-        label="Имя"
-        hint="Как к вам обращаться"
-        error={errors.name}
-      >
+      <Field id={`${baseId}-name`} label="Имя" error={errors.name}>
         {(props) => (
           <input
             {...props}
@@ -110,12 +105,7 @@ export function DetailsForm({
         )}
       </Field>
 
-      <Field
-        id={`${baseId}-email`}
-        label="Почта"
-        hint="Только для напоминания, больше ни для чего"
-        error={errors.email}
-      >
+      <Field id={`${baseId}-email`} label="Почта" error={errors.email}>
         {(props) => (
           <input
             {...props}
@@ -131,12 +121,7 @@ export function DetailsForm({
         )}
       </Field>
 
-      <Field
-        id={`${baseId}-phone`}
-        label="Телефон"
-        hint="На случай, если мастер задержится"
-        error={errors.phone}
-      >
+      <Field id={`${baseId}-phone`} label="Телефон" error={errors.phone}>
         {(props) => (
           <input
             {...props}
@@ -152,11 +137,7 @@ export function DetailsForm({
         )}
       </Field>
 
-      <Field
-        id={`${baseId}-note`}
-        label="Что нам стоит знать"
-        hint="Необязательно"
-      >
+      <Field id={`${baseId}-note`} label="Комментарий">
         {(props) => (
           <textarea
             {...props}
@@ -171,7 +152,7 @@ export function DetailsForm({
 
       <button
         type="submit"
-        className={`group relative mt-[clamp(2.5rem,5vw,4rem)] flex w-full items-center justify-between gap-6 overflow-hidden rounded-[10px] bg-ink px-[clamp(1.25rem,2.4vw,2rem)] py-[clamp(1.25rem,2.4vw,1.9rem)] text-ember transition-colors duration-500 ${EASE_CLASS}`}
+        className={`group relative mt-[clamp(2.5rem,5vw,4rem)] flex w-full items-center justify-between gap-6 overflow-hidden rounded-[10px] bg-brass px-[clamp(1.25rem,2.4vw,2rem)] py-[clamp(1.25rem,2.4vw,1.9rem)] text-ink transition-colors duration-500 ${EASE_CLASS}`}
       >
         <span className="display text-[clamp(1.35rem,2.6vw,2.25rem)] leading-none italic">
           {submitLabel}
@@ -197,19 +178,19 @@ type ControlProps = {
 };
 
 /**
- * Label above, hairline under, Bodoni in between. The complaint takes the
- * place of the hint so the row never changes height.
+ * Label above, hairline under, Bodoni in between. Nothing else: a caption under
+ * every field explaining what a telephone number is for is four extra lines of
+ * type on a form with four questions on it. The complaint's row is reserved
+ * whether or not there is one, so being told off never moves the page.
  */
 function Field({
   id,
   label,
-  hint,
   error,
   children,
 }: {
   id: string;
   label: string;
-  hint: string;
   error?: string;
   children: (props: ControlProps) => React.ReactNode;
 }) {
@@ -217,7 +198,7 @@ function Field({
 
   return (
     <p className="m-0 mt-[clamp(1.75rem,3.5vw,2.75rem)] first:mt-0">
-      <label htmlFor={id} className="label block">
+      <label htmlFor={id} className="label block opacity-75">
         {label}
       </label>
 
@@ -226,17 +207,18 @@ function Field({
         "aria-describedby": messageId,
         "aria-invalid": error ? true : undefined,
         className: `display mt-3 block w-full border-b bg-transparent pb-3 text-[clamp(1.4rem,3vw,2.4rem)] leading-[1.25] italic transition-colors duration-500 placeholder:opacity-40 ${
-          error ? "border-ink" : "border-current/30 focus:border-current"
+          error ? "border-brass" : "border-current/30 focus:border-current"
         }`,
       })}
 
       {/* The complaint sits in a live region that is on the page from the
           start; an alert added only when it fires often goes unannounced. */}
-      <span id={messageId} className="label mt-2 block">
-        <span className={error ? "hidden" : "opacity-75"}>{hint}</span>
-        <span role="alert" className="font-bold">
-          {error ?? ""}
-        </span>
+      <span
+        id={messageId}
+        role="alert"
+        className="label mt-2 block min-h-[1.55em] font-bold"
+      >
+        {error ?? ""}
       </span>
     </p>
   );

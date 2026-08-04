@@ -9,7 +9,7 @@ import { JournalStrip } from "@/components/sections/JournalStrip";
 import { BookFaq } from "@/components/sections/BookFaq";
 
 /**
- * The long scroll. Slabs alternate ember → paper → ember → paper → ink,
+ * The long scroll. Slabs alternate espresso → paper → espresso → paper → ink,
  * so the page reads as a sequence of posters rather than a stack of cards.
  */
 export default function Home() {

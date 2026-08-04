@@ -6,8 +6,7 @@ import type { PanInfo } from "motion/react";
 import { rating, shop, testimonials } from "@/lib/content";
 import { Rise } from "@/components/motion/SplitText";
 import { Frame } from "@/components/motion/Frame";
-/* Aliased: `count` is already the number of reviews in this component. */
-import { count as countOf, decimal } from "@/lib/words";
+import { decimal } from "@/lib/words";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -17,8 +16,8 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Client reviews as a two-up slider on an ink slab.
- * Grayscale portrait on the left, name in ember italic Bodoni on the right,
- * the quote underneath it with ember quotation marks. Arrows, drag and a
+ * Grayscale portrait on the left, name in brass italic Bodoni on the right,
+ * the quote underneath it with brass quotation marks. Arrows, drag and a
  * hairline progress rule all read the same index.
  *
  * Ink rather than paper: Chairs above it is already a paper slab, and two in a
@@ -104,27 +103,22 @@ export function Testimonials() {
     <section
       data-tone="paper"
       aria-labelledby="testimonials-eyebrow"
-      className="slab bg-ink text-paper"
+      className="slab lamp bg-ink text-paper"
     >
       {/* Eyebrow, rating badge, arrows */}
       <div className="flex items-start justify-between gap-5">
         <Rise className="flex min-w-0 items-center gap-4 md:gap-6">
           <span
             aria-hidden="true"
-            className="display flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-ember italic text-[clamp(1.3rem,2.2vw,1.9rem)] text-ink md:h-20 md:w-20"
+            className="display flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brass italic text-[clamp(1.3rem,2.2vw,1.9rem)] text-ink md:h-20 md:w-20"
           >
             {RATING}
           </span>
-          <span className="flex min-w-0 flex-col">
-            <span id="testimonials-eyebrow" className="label">
-              Что говорят
-            </span>
-            {/* Deliberately not "на Яндексе": the shop is invented, and a
-                template should not ship a fabricated third-party rating that
-                a real barbershop might publish unchanged. */}
-            <span className="label text-paper/60">
-              {RATING} в среднем · {countOf(count, "отзыв", "отзыва", "отзывов")}
-            </span>
+          {/* The sub-line under this used to restate the rating that is
+              already set in Bodoni inside the disc beside it, and count the
+              reviews the position rule counts at the foot of the slab. */}
+          <span id="testimonials-eyebrow" className="label">
+            Что говорят
           </span>
         </Rise>
 
@@ -179,7 +173,7 @@ export function Testimonials() {
               aria-label={`Отзыв ${i + 1} из ${count}`}
               /* pl-[3px]: the next slide's box starts exactly on the clip
                  edge, and Playfair's « has enough left side bearing to draw a
-                 pixel of ember outside it: a stray orange tick at the right
+                 pixel of brass outside it: a stray gold tick at the right
                  edge of every phone screenshot. */
               className="flex shrink-0 grow-0 basis-full flex-col gap-6 pr-[var(--gutter)] pl-[3px] lg:basis-1/2 lg:flex-row lg:items-start lg:gap-8"
             >
@@ -193,14 +187,14 @@ export function Testimonials() {
               />
 
               <div className="min-w-0 flex-1">
-                <p className="display text-lg italic text-ember">{t.name}</p>
+                <p className="display text-lg italic text-brass">{t.name}</p>
                 <blockquote className="mt-4 md:mt-6">
                   <p className="text-md font-semibold leading-[1.35]">
-                    <span aria-hidden="true" className="text-ember">
+                    <span aria-hidden="true" className="text-brass">
                       «
                     </span>
                     {t.quote}
-                    <span aria-hidden="true" className="text-ember">
+                    <span aria-hidden="true" className="text-brass">
                       »
                     </span>
                   </p>
@@ -223,7 +217,7 @@ export function Testimonials() {
         </span>
         <span className="relative block h-px flex-1 bg-paper/20">
           <motion.span
-            className="absolute inset-y-0 left-0 block bg-ember"
+            className="absolute inset-y-0 left-0 block bg-brass"
             style={{ width: `${(perView / count) * 100}%` }}
             animate={{ x: `${(index / perView) * 100}%` }}
             transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE }}

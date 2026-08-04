@@ -21,11 +21,11 @@ export const metadata: Metadata = {
    agree on the same markup. */
 
 
-const TOTAL_YEARS = barbers.reduce((sum, b) => sum + b.years, 0);
-const FIRST_CHAIR = barbers[0].chair;
-const LAST_CHAIR = barbers[barbers.length - 1].chair;
-/* "Chair 06" when there are five; the one we are hiring for. */
-const NEXT_CHAIR = String(barbers.length + 1).padStart(FIRST_CHAIR.length, "0");
+/* "Кресло 06" when there are five; the one we are hiring for. */
+const NEXT_CHAIR = String(barbers.length + 1).padStart(
+  barbers[0].chair.length,
+  "0"
+);
 
 /* The one line on the page that is not a name, a number or a bio. */
 const APPROACH =
@@ -38,8 +38,8 @@ const roleReadable = (role: string) => role.replace(" · ", ", ");
 export default function BarbersPage() {
   return (
     <>
-      {/* ── the ember opener: one sentence, dropped a third of a screen ── */}
-      <section data-tone="ink" className="relative bg-ember text-ink">
+      {/* ── the espresso opener: one sentence, dropped a third of a screen ── */}
+      <section data-tone="paper" className="relative lamp bg-espresso text-paper">
         <div className="edge pt-[30svh] pb-[clamp(4rem,9vw,9rem)]">
           <Rise className="border-t border-current/20 pt-4">
             <p className="label">
@@ -58,17 +58,6 @@ export default function BarbersPage() {
               { text: "взаимозаменяем", italic: true },
             ]}
           />
-
-          <Rise
-            delay={0.3}
-            className="mt-[clamp(4rem,12vw,9rem)] flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2 border-t border-current/20 pt-4"
-          >
-            <span className="label">
-              Кресла {FIRST_CHAIR}-{LAST_CHAIR}
-            </span>
-            <span className="label">{spellYears(TOTAL_YEARS)} на всех</span>
-            <span className="label">{shop.city}</span>
-          </Rise>
         </div>
       </section>
 
@@ -81,7 +70,7 @@ export default function BarbersPage() {
       ))}
 
       {/* ── the sixth chair ── */}
-      <section data-tone="ink" className="bg-ember text-ink">
+      <section data-tone="paper" className="lamp bg-espresso text-paper">
         <div className="edge py-[clamp(5rem,11vw,12rem)]">
           <Rise className="ml-auto max-w-[34ch] border-t border-current/20 pt-5">
             <p className="label">Кресло {NEXT_CHAIR} · свободно</p>
@@ -159,11 +148,11 @@ function Chair({
                 objectPosition="center 30%"
               />
 
-              {/* The sticker: an ember disc on the outer corner of the photo,
+              {/* The sticker: a brass disc on the outer corner of the photo,
                   alternating sides so five of them zig-zag down the page. */}
               <span
                 aria-hidden="true"
-                className={`absolute top-[clamp(0.85rem,1.8vw,1.75rem)] flex size-[clamp(2.75rem,5vw,4.5rem)] items-center justify-center rounded-full bg-ember text-ink ${
+                className={`absolute top-[clamp(0.85rem,1.8vw,1.75rem)] flex size-[clamp(2.75rem,5vw,4.5rem)] items-center justify-center rounded-full bg-brass text-ink ${
                   portraitLeft
                     ? "left-[clamp(0.85rem,1.8vw,1.75rem)]"
                     : "right-[clamp(0.85rem,1.8vw,1.75rem)]"
@@ -185,7 +174,9 @@ function Chair({
             >
               <Rise className="flex items-baseline justify-between gap-4 border-t border-current/20 pt-4">
                 <span className="label">Кресло {barber.chair}</span>
-                <span className="label text-right text-ash">{barber.role}</span>
+                <span className="label text-right text-ash">
+                  {spellYears(barber.years)}
+                </span>
               </Rise>
 
               {/* `text-xl` collides with a Tailwind default size key and drags
@@ -193,7 +184,7 @@ function Chair({
               <SplitText
                 as="h2"
                 delay={0.08}
-                className="display mt-[clamp(1.25rem,2.5vw,2.25rem)] text-xl leading-[0.86]"
+                className="display mt-[clamp(1.25rem,2.5vw,2.25rem)] text-xl leading-[0.92]"
                 segments={
                   last
                     ? [{ text: first }, { text: last, italic: true }]
@@ -201,35 +192,19 @@ function Chair({
                 }
               />
 
-              <Rise delay={0.16} className="mt-4">
-                <p className="label text-ash">
-                  {spellYears(barber.years)} за креслом
-                </p>
-              </Rise>
-
+              {/* Name, then the paragraph. The role, the years and the row of
+                  speciality pills were four separate captions on one person,
+                  and the paragraph says all of it in sentences. */}
               <Rise delay={0.22} className="mt-[clamp(1.75rem,3vw,2.75rem)]">
                 <p className="max-w-[44ch] font-sans text-md leading-[1.42]">
                   {barber.bio}
                 </p>
               </Rise>
 
-              <Rise delay={0.28} className="mt-[clamp(1.75rem,3vw,2.5rem)]">
-                <ul className="flex flex-wrap gap-2">
-                  {barber.specialties.map((s) => (
-                    <li
-                      key={s}
-                      className="label rounded-full border border-current/25 px-3 py-1"
-                    >
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              </Rise>
-
               <Rise delay={0.34} className="mt-[clamp(2.5rem,5vw,4rem)]">
                 <Link
                   href={`/book?barber=${barber.id}`}
-                  className="ui group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-ember-deep"
+                  className="ui tap-reach group inline-flex items-center gap-3 border-b border-current/30 pb-2 transition-colors duration-300 hover:text-brass-deep"
                 >
                   {/* "Записаться к Артёму" would need the dative of a name
                       content.ts only carries in the nominative, and Russian
@@ -258,11 +233,11 @@ function Chair({
 /** The break in the rhythm: black, one italic line, nothing else on it. */
 function Approach() {
   return (
-    <section data-tone="paper" className="bg-ink text-paper">
+    <section data-tone="paper" className="lamp bg-ink text-paper">
       <div className="edge py-[clamp(6rem,15vw,15rem)]">
         <SplitText
           as="p"
-          className="display max-w-[20ch] text-xl leading-[0.9] md:ml-[28%]"
+          className="display max-w-[20ch] text-xl leading-[0.95] md:ml-[28%]"
           segments={[{ text: APPROACH, italic: true }]}
         />
       </div>

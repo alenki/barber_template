@@ -4,12 +4,14 @@ import type { CSSProperties, ReactNode } from "react";
 
 /**
  * One choice: a hairline, an italic Bodoni name and a generous hit target.
- * Hovering or focusing wipes an ink bar in from the left; choosing leaves it
- * there, so a made decision reads as ink filled with ember.
+ * Hovering or focusing wipes a brass bar in from the left; choosing leaves it
+ * there, so a made decision reads as the one lit row on a dark page. Three
+ * things at most on a row — a name, one qualifier, one number — because the
+ * question being asked is already at the top of the screen.
  */
 
 /**
- * The ink fill bleeds past the column so the type has air inside it; the row
+ * The brass fill bleeds past the column so the type has air inside it; the row
  * itself does not, so every hairline lands on the same line as the step rule
  * above the list.
  */
@@ -23,9 +25,7 @@ export function OptionRow({
   media,
   title,
   detail,
-  aside,
   value,
-  valueNote,
   selected,
   onSelect,
 }: {
@@ -34,12 +34,10 @@ export function OptionRow({
   /** Optional thumbnail block. */
   media?: ReactNode;
   title: string;
+  /** One qualifying line, never two. */
   detail?: string;
-  /** Secondary line, hidden on small screens where the row must stay short. */
-  aside?: string;
   /** The number that matters, set in Bodoni on the right. */
   value?: string;
-  valueNote?: string;
   selected: boolean;
   onSelect: () => void;
 }) {
@@ -50,13 +48,13 @@ export function OptionRow({
         onClick={onSelect}
         aria-pressed={selected}
         className={`group relative flex w-full items-center gap-[clamp(0.85rem,2vw,1.75rem)] py-[clamp(1.15rem,2.4vw,1.9rem)] text-left transition-colors duration-500 ${EASE_CLASS} ${
-          selected ? "text-ember" : "hover:text-ember focus-visible:text-ember"
+          selected ? "text-ink" : "hover:text-ink focus-visible:text-ink"
         }`}
       >
         <span
           aria-hidden="true"
           style={FILL_BLEED}
-          className={`absolute inset-y-0 origin-left bg-ink transition-transform duration-[600ms] ${EASE_CLASS} ${
+          className={`absolute inset-y-0 origin-left bg-brass transition-transform duration-[600ms] ${EASE_CLASS} ${
             selected
               ? "scale-x-100"
               : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"
@@ -78,40 +76,15 @@ export function OptionRow({
             {title}
           </span>
           {detail ? (
-            <span className="label mt-2 block">{detail}</span>
-          ) : null}
-          {aside ? (
-            <span className="label mt-1 hidden md:block">{aside}</span>
+            <span className="label mt-2 block opacity-75">{detail}</span>
           ) : null}
         </span>
 
-        {value || valueNote ? (
-          <span className="relative z-10 shrink-0 text-right">
-            {value ? (
-              <span className="display block text-[clamp(1.2rem,2.1vw,1.9rem)] leading-none">
-                {value}
-              </span>
-            ) : null}
-            {valueNote ? (
-              <span className="label mt-2 block">{valueNote}</span>
-            ) : null}
+        {value ? (
+          <span className="display relative z-10 shrink-0 text-right text-[clamp(1.2rem,2.1vw,1.9rem)] leading-none whitespace-nowrap">
+            {value}
           </span>
         ) : null}
-
-        <span
-          aria-hidden="true"
-          className={`relative z-10 grid size-[clamp(1.6rem,2.7vw,2.3rem)] shrink-0 place-items-center rounded-full transition-colors duration-500 ${EASE_CLASS} ${
-            selected ? "bg-ember" : "border border-current/35"
-          }`}
-        >
-          <span
-            className={`display text-[clamp(0.85rem,1.4vw,1.2rem)] leading-none transition-opacity duration-300 ${
-              selected ? "opacity-0" : "opacity-100"
-            }`}
-          >
-            +
-          </span>
-        </span>
       </button>
     </li>
   );

@@ -1,0 +1,91 @@
+# ============================================================
+# Миллиметр · Apache config for reg.ru shared hosting
+#
+# Lives in public/, so `next build` copies it to the root of out/ and it
+# travels with the upload. Every directive is wrapped in <IfModule>: reg.ru
+# enables mod_deflate, mod_expires and mod_headers on its standard plans, but
+# an unwrapped directive on a plan without one of them takes the whole site
+# down with a 500, and a static site is not worth that risk.
+# ============================================================
+
+# ------------------------------------------------------------
+# Compression. The largest single win on this site: the build ships about 1MB
+# of JS, HTML, CSS and RSC payload per page, and all of it is text that
+# compresses to roughly a quarter of that. Images and fonts are left alone —
+# webp and woff2 are already compressed and running deflate over them costs
+# CPU to make them very slightly bigger.
+# ------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE text/javascript application/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE application/rss+xml image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------
+# Caching. Everything under /_next/static/ and /img/r/ carries a content hash
+# or an explicit width in its filename, so a changed file is always a changed
+# URL and it can be cached hard. HTML must never be: it is the thing that
+# points at the hashed assets, and a cached copy would go on pointing at the
+# previous build's files after a redeploy.
+# ------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                          "access plus 1 month"
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType image/webp                "access plus 1 year"
+  ExpiresByType image/jpeg                "access plus 1 year"
+  ExpiresByType image/svg+xml             "access plus 1 year"
+  ExpiresByType font/woff2                "access plus 1 year"
+  ExpiresByType text/css                  "access plus 1 year"
+  ExpiresByType text/javascript           "access plus 1 year"
+  ExpiresByType application/javascript    "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Immutable for the hashed bundles: tells the browser not even to revalidate.
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # The generated image variants are equally content-addressed by width.
+  <FilesMatch "\.(webp|avif)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Always revalidate the pages themselves.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  # The RSC payloads Next writes beside each route. They are versioned with the
+  # build, not hashed, so they follow the HTML rather than the bundles.
+  <FilesMatch "\.txt$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ------------------------------------------------------------
+# Routing. The build is `trailingSlash: true`, so every route is a real
+# directory with an index.html inside it and Apache resolves the whole site
+# with DirectoryIndex alone — no rewrite rules to keep in step with the routes.
+# The one thing worth adding is the 404, so a bad URL gets the site's own page
+# rather than Apache's.
+# ------------------------------------------------------------
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+# Directory listings off: without this, any folder that somehow lacks an
+# index.html serves its file list to the public.
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+  AddCharset UTF-8 .html .css .js .json .txt .xml .svg
+</IfModule>

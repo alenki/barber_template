@@ -12,7 +12,7 @@ export type ChromeSlab = {
   bg: string;
 };
 
-const INITIAL: ChromeSlab = { tone: "ink", bg: "#ff5a1f" };
+const INITIAL: ChromeSlab = { tone: "paper", bg: "#241d17" };
 
 /**
  * Backgrounds are set with Tailwind utilities, so the only honest source for
@@ -33,7 +33,7 @@ function readBackground(el: HTMLElement): string {
 }
 
 /**
- * The header and the Book pill float over slabs that flip between ember, white
+ * The header and the Book pill float over slabs that flip between espresso, white
  * and black. Rather than tint them, we read whichever slab is currently under
  * the header baseline and let it declare both the ink colour (`data-tone`) and
  * its own background.
